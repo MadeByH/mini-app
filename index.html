@@ -1,43 +1,123 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>فروشگاه سکه</title>
-  <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      text-align: center;
-      background: #f2f2f2;
-      margin-top: 50px;
-    }
-    h1 {
-      color: #333;
-    }
-    button {
-      padding: 15px 30px;
-      font-size: 18px;
-      background: #00c853;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #00b248;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فروشگاه ربات 🤖</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            text-align: center;
+            background: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ecf0f1;
+            border-radius: 8px;
+        }
+
+        .section h2 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .section p {
+            color: #7f8c8d;
+            line-height: 1.6;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            background-color: #2ecc71;
+            color: #fff;
+            border-radius: 6px;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #27ae60;
+        }
+
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            color: #95a5a6;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <h1>🪙 فروشگاه سکه</h1>
 
-  <h1>🪙 فروشگاه سکه</h1>
-  <p>برای خرید ۵۰ سکه روی دکمه کلیک کن:</p>
-  <button onclick="buyCoins()">خرید ۵۰ سکه</button>
+        <div class="section">
+            <h2>خرید سکه</h2>
+            <p>با خرید سکه، از امکانات ویژه ربات بهره‌مند شوید.</p>
+            <a href="#" class="button" onclick="buyCoins()">خرید ۵۰ سکه</a>
+        </div>
 
-  <script>
-    function buyCoins() {
-      alert("✅ خرید ۵۰ سکه با موفقیت انجام شد!");
-    }
-  </script>
+        <div class="section">
+            <h2>تعرفه تبلیغات</h2>
+            <p>برای تبلیغ در مینی اپ یا ربات، تعرفه‌های زیر را بررسی کنید:</p>
+            <ul>
+                <li>تبلیغ بنری: [قیمت]</li>
+                <li>تبلیغ متنی: [قیمت]</li>
+                <li>تبلیغ رسانه‌ای: [قیمت]</li>
+            </ul>
+            <a href="https://ble.ir/hello_bots" class="button">سفارش تبلیغ</a>
+        </div>
 
+        <div class="section">
+            <h2>راهنما</h2>
+            <p>برای استفاده بهتر از مینی اپ، راهنمای زیر را مطالعه کنید:</p>
+            <ol>
+                <li>[مرحله ۱]</li>
+                <li>[مرحله ۲]</li>
+                <li>[مرحله ۳]</li>
+            </ol>
+            <a href="hrtps://ble.ir/add_members_bot?start" class="button">مشاهده کامل راهنما</a>
+        </div>
+
+        <div class="section">
+            <h2>کانال‌ها و ربات‌ها</h2>
+            <p>به کانال‌ها و ربات‌های ما بپیوندید:</p>
+            <a href="https://t.me/channel_chatgpt_openai" class="button">کانال تلگرام</a>
+            <a href="https://t.me/Members_and_Manage_Bot" class="button">ربات تلگرام</a>
+            <a href="https://ble.ir/add_members_bot" class="button">ربات بله</a>
+            <a href="https://ble.ir/channel_member_and_manager_bot" class="button">کانال بله</a>
+        </div>
+
+        <div class="footer">
+            <p>© 2025 فروشگاه ربات </p>
+        </div>
+    </div>
+
+    <script>
+        function buyCoins() {
+            alert("✅ خرید ۵۰ سکه با موفقیت انجام شد!");
+        }
+    </script>
 </body>
 </html>

@@ -29,6 +29,7 @@
       margin: 10px;
       background-size: contain;
       background-repeat: no-repeat;
+      background-position: center;
       border: 2px solid transparent;
       cursor: pointer;
     }
@@ -41,7 +42,7 @@
       width: 100vw;
       height: 100vh;
       position: relative;
-      background: url('https://i.imgur.com/8pP3V5C.jpg') no-repeat center center/cover;
+      background: url('https://i.imgur.com/Wd1kK8X.jpg') no-repeat center center/cover;
     }
 
     .character {
@@ -50,15 +51,18 @@
       position: absolute;
       top: 100px;
       left: 100px;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
       transition: all 0.05s linear;
     }
 
     #joystick-zone {
       position: fixed;
-      bottom: 30px;
-      left: 30px;
-      width: 150px;
-      height: 150px;
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
       z-index: 5;
     }
 
@@ -71,13 +75,13 @@
 </head>
 <body>
 
-<!-- صفحه انتخاب شخصیت -->
+<!-- انتخاب شخصیت -->
 <div id="menu">
   <h2>یک شخصیت انتخاب کن:</h2>
   <div style="display: flex;">
-    <div class="character-option" style="background-image: url('https://i.imgur.com/tT8tKqZ.gif')" onclick="selectCharacter('https://i.imgur.com/tT8tKqZ.gif')"></div>
-    <div class="character-option" style="background-image: url('https://i.imgur.com/93JgL9T.gif')" onclick="selectCharacter('https://i.imgur.com/93JgL9T.gif')"></div>
-    <div class="character-option" style="background-image: url('https://i.imgur.com/FQyDVRi.gif')" onclick="selectCharacter('https://i.imgur.com/FQyDVRi.gif')"></div>
+    <div class="character-option" style="background-image: url('https://i.imgur.com/N5uCbDu.gif')" onclick="selectCharacter('https://i.imgur.com/N5uCbDu.gif')"></div>
+    <div class="character-option" style="background-image: url('https://i.imgur.com/OMZZbPd.gif')" onclick="selectCharacter('https://i.imgur.com/OMZZbPd.gif')"></div>
+    <div class="character-option" style="background-image: url('https://i.imgur.com/C3mxpPm.gif')" onclick="selectCharacter('https://i.imgur.com/C3mxpPm.gif')"></div>
   </div>
 </div>
 
@@ -93,39 +97,31 @@
   let vx = 0, vy = 0;
 
   function selectCharacter(imageUrl) {
-    // مخفی کردن منو و نمایش بازی
     document.getElementById('menu').style.display = 'none';
     document.getElementById('game').style.display = 'block';
-
-    // اعمال شخصیت انتخاب شده
-    player.style.background = `url('${imageUrl}') no-repeat center/contain`;
+    player.style.backgroundImage = `url('${imageUrl}')`;
   }
 
-  // تابع آپدیت موقعیت شخصیت
   function update() {
     x += vx;
     y += vy;
-
-    // محدود کردن به داخل صفحه
     x = Math.max(0, Math.min(window.innerWidth - 60, x));
     y = Math.max(0, Math.min(window.innerHeight - 60, y));
-
     player.style.left = x + 'px';
     player.style.top = y + 'px';
     requestAnimationFrame(update);
   }
 
-  // جوی‌استیک
   const joystick = nipplejs.create({
     zone: document.getElementById('joystick-zone'),
     mode: 'static',
-    position: { left: '75px', bottom: '75px' },
+    position: { left: '60px', bottom: '60px' },
     color: 'blue'
   });
 
   joystick.on('move', (evt, data) => {
     const rad = data.angle.radian;
-    const speed = data.distance * 0.1;
+    const speed = data.distance * 0.15;
     vx = Math.cos(rad) * speed;
     vy = Math.sin(rad) * speed;
   });
@@ -135,7 +131,6 @@
     vy = 0;
   });
 
-  // اجرای بازی
   update();
 </script>
 </body>

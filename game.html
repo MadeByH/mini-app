@@ -59,10 +59,11 @@
 
     #joystick-zone {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
-      width: 120px;
-      height: 120px;
+      /* تغییر موقعیت و اندازه برای شبیه شدن به کد بالایی */
+      bottom: 75px; /* از 20px به 75px */
+      left: 75px; /* از 20px به 75px */
+      width: 150px; /* از 120px به 150px */
+      height: 150px; /* از 120px به 150px */
       z-index: 5;
     }
 
@@ -105,6 +106,7 @@
   function update() {
     x += vx;
     y += vy;
+    // محدود کردن حرکت شخصیت در صفحه بازی
     x = Math.max(0, Math.min(window.innerWidth - 60, x));
     y = Math.max(0, Math.min(window.innerHeight - 60, y));
     player.style.left = x + 'px';
@@ -115,12 +117,14 @@
   const joystick = nipplejs.create({
     zone: document.getElementById('joystick-zone'),
     mode: 'static',
-    position: { left: '60px', bottom: '60px' },
+    // استفاده از مقادیر موقعیت مشابه کد بالایی
+    position: { left: '75px', bottom: '75px' }, // تغییر موقعیت
     color: 'blue'
   });
 
   joystick.on('move', (evt, data) => {
     const rad = data.angle.radian;
+    // سرعت حرکت را کمی بیشتر کردیم تا شبیه کد بالایی شود
     const speed = data.distance * 0.15;
     vx = Math.cos(rad) * speed;
     vy = Math.sin(rad) * speed;

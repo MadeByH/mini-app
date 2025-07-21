@@ -4,150 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>بازی فانتزی من</title>
+
+  <!-- استایل صفحه -->
   <style>
     body {
       margin: 0;
       overflow: hidden;
-      font-family: sans-serif;
+      background-color: #aee;
     }
-
-    /* استایل منوی انتخاب شخصیت */
-    #menu {
-      position: absolute;
-      width: 100vw;
-      height: 100vh;
-      background: linear-gradient(#bde, #fff);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-
-    .character-option {
-      width: 80px;
-      height: 80px;
-      margin: 10px;
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
-      border: 2px solid transparent;
-      cursor: pointer;
-    }
-
-    .character-option:hover {
-      border-color: #00f;
-    }
-
-    /* استایل صفحه بازی */
     #game {
       width: 100vw;
       height: 100vh;
       position: relative;
-      background: url('https://i.imgur.com/Wd1kK8X.jpg') no-repeat center center/cover; /* پس‌زمینه بازی */
     }
-
     .character {
-      width: 50px; /* اندازه شخصیت مطابق کد نمونه */
-      height: 50px; /* اندازه شخصیت مطابق کد نمونه */
-      background-size: contain;
-      background-repeat: no-repeat;
-      background-position: center;
+      width: 50px;
+      height: 50px;
+      background: url('https://i.imgur.com/tT8tKqZ.gif') no-repeat center/contain;
       position: absolute;
       top: 100px;
       left: 100px;
       transition: all 0.05s linear;
     }
-
-    /* استایل جوی‌استیک مطابق کد نمونه */
     #joystick-zone {
       position: fixed;
-      bottom: 30px; /* این مقدار از کد نمونه گرفته شده */
-      left: 30px; /* این مقدار از کد نمونه گرفته شده */
+      bottom: 30px;
+      left: 30px;
       width: 150px;
       height: 150px;
       z-index: 10;
     }
-
-    h2 {
-      margin-bottom: 10px;
-    }
   </style>
 
+  <!-- کتابخانه جوی‌استیک -->
   <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
 </head>
 <body>
-
-<!-- منوی انتخاب شخصیت -->
-<div id="menu">
-  <h2>یک شخصیت انتخاب کن:</h2>
-  <div style="display: flex;">
-    <div class="character-option" style="background-image: url('https://i.imgur.com/N5uCbDu.gif')" onclick="selectCharacter('https://i.imgur.com/N5uCbDu.gif')"></div>
-    <div class="character-option" style="background-image: url('https://i.imgur.com/OMZZbPd.gif')" onclick="selectCharacter('https://i.imgur.com/OMZZbPd.gif')"></div>
-    <div class="character-option" style="background-image: url('https://i.imgur.com/C3mxpPm.gif')" onclick="selectCharacter('https://i.imgur.com/C3mxpPm.gif')"></div>
+  <div id="game">
+    <div id="player" class="character"></div>
+    <div id="joystick-zone"></div>
   </div>
-</div>
 
-<!-- صفحه بازی -->
-<div id="game" style="display: none;">
-  <div id="player" class="character"></div>
-  <div id="joystick-zone"></div>
-</div>
+  <script>
+    const player = document.getElementById('player');
+    let x = 100, y = 100;
+    let vx = 0, vy = 0;
 
-<script>
-  let player = document.getElementById('player');
-  let x = 100, y = 100; // موقعیت اولیه شخصیت
-  let vx = 0, vy = 0; // سرعت شخصیت
+    // به‌روزرسانی موقعیت در هر فریم
+    function update() {
+      x += vx;
+      y += vy;
+      player.style.left = x + 'px';
+      player.style.top = y + 'px';
+      requestAnimationFrame(update);
+    }
 
-  // تابع انتخاب شخصیت
-  function selectCharacter(imageUrl) {
-    document.getElementById('menu').style.display = 'none'; // مخفی کردن منوی انتخاب
-    document.getElementById('game').style.display = 'block'; // نمایش صفحه بازی
-    player.style.backgroundImage = `url('${imageUrl}')`; // تنظیم تصویر شخصیت
-  }
+    // راه‌اندازی جوی‌استیک
+    const joystick = nipplejs.create({
+      zone: document.getElementById('joystick-zone'),
+      mode: 'static',
+      position: { left: '75px', bottom: '75px' },
+      color: 'blue'
+    });
 
-  // تابع آپدیت موقعیت شخصیت
-  function update() {
-    x += vx;
-    y += vy;
+    joystick.on('move', (evt, data) => {
+      const rad = data.angle.radian;
+      const speed = data.distance * 0.1;
+      vx = Math.cos(rad) * speed;
+      vy = Math.sin(rad) * speed;
+    });
 
-    // محدود کردن حرکت شخصیت در صفحه بازی
-    // اطمینان از اینکه شخصیت از لبه‌های صفحه خارج نشود
-    // از offsetWidth و offsetHeight برای محاسبه درست عرض و ارتفاع شخصیت استفاده شده
-    x = Math.max(0, Math.min(window.innerWidth - player.offsetWidth, x));
-    y = Math.max(0, Math.min(window.innerHeight - player.offsetHeight, y));
+    joystick.on('end', () => {
+      vx = 0;
+      vy = 0;
+    });
 
-    player.style.left = x + 'px';
-    player.style.top = y + 'px';
-
-    requestAnimationFrame(update); // درخواست فریم بعدی برای انیمیشن پیوسته
-  }
-
-  // راه‌اندازی جوی‌استیک با تنظیمات کد نمونه
-  const joystick = nipplejs.create({
-    zone: document.getElementById('joystick-zone'),
-    mode: 'static',
-    position: { left: '75px', bottom: '75px' }, /* موقعیت جوی‌استیک در مرکز منطقه تعیین شده */
-    color: 'blue'
-  });
-
-  // پردازش ورودی جوی‌استیک هنگام حرکت
-  joystick.on('move', (evt, data) => {
-    const rad = data.angle.radian;
-    // محاسبه سرعت با ضریب 0.1 (مطابق کد نمونه)
-    const speed = data.distance * 0.1;
-    vx = Math.cos(rad) * speed;
-    vy = Math.sin(rad) * speed;
-  });
-
-  // توقف حرکت شخصیت هنگام رها کردن جوی‌استیک
-  joystick.on('end', () => {
-    vx = 0;
-    vy = 0;
-  });
-
-  // شروع حلقه انیمیشن بازی
-  update();
-</script>
+    // شروع حلقه انیمیشن
+    update();
+  </script>
 </body>
 </html>

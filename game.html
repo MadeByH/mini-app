@@ -1,28 +1,86 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8">
-  <title>بازی من</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>بازی فانتزی من</title>
+
+  <!-- استایل صفحه -->
   <style>
     body {
       margin: 0;
-      padding: 0;
-      background: #111;
-      color: #fff;
-      font-family: sans-serif;
-      text-align: center;
+      overflow: hidden;
+      background-color: #aee;
     }
-    canvas {
-      display: block;
-      margin: auto;
-      border: 2px solid #fff;
+    #game {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+    }
+    .character {
+      width: 50px;
+      height: 50px;
+      background: url('https://i.imgur.com/tT8tKqZ.gif') no-repeat center/contain;
+      position: absolute;
+      top: 100px;
+      left: 100px;
+      transition: all 0.05s linear;
+    }
+    #joystick-zone {
+      position: fixed;
+      bottom: 30px;
+      left: 30px;
+      width: 150px;
+      height: 150px;
+      z-index: 10;
     }
   </style>
+
+  <!-- کتابخانه جوی‌استیک -->
+  <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
 </head>
 <body>
-  <h1>🎮 بازی من در بله</h1>
-  <canvas id="gameCanvas" width="400" height="600"></canvas>
+  <div id="game">
+    <div id="player" class="character"></div>
+    <div id="joystick-zone"></div>
+  </div>
 
-  <script src="my-game-ble.js"></script>
+  <script>
+    const player = document.getElementById('player');
+    let x = 100, y = 100;
+    let vx = 0, vy = 0;
+
+    // به‌روزرسانی موقعیت در هر فریم
+    function update() {
+      x += vx;
+      y += vy;
+      player.style.left = x + 'px';
+      player.style.top = y + 'px';
+      requestAnimationFrame(update);
+    }
+
+    // راه‌اندازی جوی‌استیک
+    const joystick = nipplejs.create({
+      zone: document.getElementById('joystick-zone'),
+      mode: 'static',
+      position: { left: '75px', bottom: '75px' },
+      color: 'blue'
+    });
+
+    joystick.on('move', (evt, data) => {
+      const rad = data.angle.radian;
+      const speed = data.distance * 0.1;
+      vx = Math.cos(rad) * speed;
+      vy = Math.sin(rad) * speed;
+    });
+
+    joystick.on('end', () => {
+      vx = 0;
+      vy = 0;
+    });
+
+    // شروع حلقه انیمیشن
+    update();
+  </script>
 </body>
 </html>

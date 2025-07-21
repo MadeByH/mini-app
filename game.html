@@ -11,6 +11,7 @@
       font-family: sans-serif;
     }
 
+    /* استایل منوی انتخاب شخصیت */
     #menu {
       position: absolute;
       width: 100vw;
@@ -38,33 +39,34 @@
       border-color: #00f;
     }
 
+    /* استایل صفحه بازی */
     #game {
       width: 100vw;
       height: 100vh;
       position: relative;
-      background: url('https://i.imgur.com/Wd1kK8X.jpg') no-repeat center center/cover;
+      background: url('https://i.imgur.com/Wd1kK8X.jpg') no-repeat center center/cover; /* پس‌زمینه بازی */
     }
 
     .character {
-      width: 60px;
-      height: 60px;
-      position: absolute;
-      top: 100px;
-      left: 100px;
+      width: 50px; /* اندازه شخصیت مطابق کد نمونه */
+      height: 50px; /* اندازه شخصیت مطابق کد نمونه */
       background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
+      position: absolute;
+      top: 100px;
+      left: 100px;
       transition: all 0.05s linear;
     }
 
+    /* استایل جوی‌استیک مطابق کد نمونه */
     #joystick-zone {
       position: fixed;
-      /* تغییر موقعیت و اندازه برای شبیه شدن به کد بالایی */
-      bottom: 75px; /* از 20px به 75px */
-      left: 75px; /* از 20px به 75px */
-      width: 150px; /* از 120px به 150px */
-      height: 150px; /* از 120px به 150px */
-      z-index: 5;
+      bottom: 30px; /* این مقدار از کد نمونه گرفته شده */
+      left: 30px; /* این مقدار از کد نمونه گرفته شده */
+      width: 150px;
+      height: 150px;
+      z-index: 10;
     }
 
     h2 {
@@ -76,7 +78,7 @@
 </head>
 <body>
 
-<!-- انتخاب شخصیت -->
+<!-- منوی انتخاب شخصیت -->
 <div id="menu">
   <h2>یک شخصیت انتخاب کن:</h2>
   <div style="display: flex;">
@@ -86,7 +88,7 @@
   </div>
 </div>
 
-<!-- بازی -->
+<!-- صفحه بازی -->
 <div id="game" style="display: none;">
   <div id="player" class="character"></div>
   <div id="joystick-zone"></div>
@@ -94,47 +96,57 @@
 
 <script>
   let player = document.getElementById('player');
-  let x = 100, y = 100;
-  let vx = 0, vy = 0;
+  let x = 100, y = 100; // موقعیت اولیه شخصیت
+  let vx = 0, vy = 0; // سرعت شخصیت
 
+  // تابع انتخاب شخصیت
   function selectCharacter(imageUrl) {
-    document.getElementById('menu').style.display = 'none';
-    document.getElementById('game').style.display = 'block';
-    player.style.backgroundImage = `url('${imageUrl}')`;
+    document.getElementById('menu').style.display = 'none'; // مخفی کردن منوی انتخاب
+    document.getElementById('game').style.display = 'block'; // نمایش صفحه بازی
+    player.style.backgroundImage = `url('${imageUrl}')`; // تنظیم تصویر شخصیت
   }
 
+  // تابع آپدیت موقعیت شخصیت
   function update() {
     x += vx;
     y += vy;
+
     // محدود کردن حرکت شخصیت در صفحه بازی
-    x = Math.max(0, Math.min(window.innerWidth - 60, x));
-    y = Math.max(0, Math.min(window.innerHeight - 60, y));
+    // اطمینان از اینکه شخصیت از لبه‌های صفحه خارج نشود
+    // از offsetWidth و offsetHeight برای محاسبه درست عرض و ارتفاع شخصیت استفاده شده
+    x = Math.max(0, Math.min(window.innerWidth - player.offsetWidth, x));
+    y = Math.max(0, Math.min(window.innerHeight - player.offsetHeight, y));
+
     player.style.left = x + 'px';
     player.style.top = y + 'px';
-    requestAnimationFrame(update);
+
+    requestAnimationFrame(update); // درخواست فریم بعدی برای انیمیشن پیوسته
   }
 
+  // راه‌اندازی جوی‌استیک با تنظیمات کد نمونه
   const joystick = nipplejs.create({
     zone: document.getElementById('joystick-zone'),
     mode: 'static',
-    // استفاده از مقادیر موقعیت مشابه کد بالایی
-    position: { left: '75px', bottom: '75px' }, // تغییر موقعیت
+    position: { left: '75px', bottom: '75px' }, /* موقعیت جوی‌استیک در مرکز منطقه تعیین شده */
     color: 'blue'
   });
 
+  // پردازش ورودی جوی‌استیک هنگام حرکت
   joystick.on('move', (evt, data) => {
     const rad = data.angle.radian;
-    // سرعت حرکت را کمی بیشتر کردیم تا شبیه کد بالایی شود
-    const speed = data.distance * 0.15;
+    // محاسبه سرعت با ضریب 0.1 (مطابق کد نمونه)
+    const speed = data.distance * 0.1;
     vx = Math.cos(rad) * speed;
     vy = Math.sin(rad) * speed;
   });
 
+  // توقف حرکت شخصیت هنگام رها کردن جوی‌استیک
   joystick.on('end', () => {
     vx = 0;
     vy = 0;
   });
 
+  // شروع حلقه انیمیشن بازی
   update();
 </script>
 </body>

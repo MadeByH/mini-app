@@ -9,34 +9,32 @@
         body {
             margin: 0;
             overflow: hidden;
-            font-family: sans-serif; /* فونت بهتر */
+            font-family: sans-serif;
         }
 
-        /* استایل دکمه تنظیمات/خانه */
         #settings-button {
             position: absolute;
             top: 20px;
             right: 20px;
             padding: 10px 15px;
-            background-color: rgba(0, 0, 0, 0.5); /* پس‌زمینه نیمه‌شفاف */
+            background-color: rgba(0, 0, 0, 0.5);
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            z-index: 20; /* بالاتر از بقیه المان‌ها */
+            z-index: 20;
         }
 
-        /* استایل منوی انتخاب شخصیت */
         #menu {
             position: absolute;
             width: 100vw;
             height: 100vh;
             background: linear-gradient(#bde, #fff);
-            display: none; /* مخفی به صورت پیش‌فرض */
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 30; /* بالاتر از دکمه و بازی */
+            z-index: 30;
         }
 
         .character-option {
@@ -54,12 +52,40 @@
             border-color: #00f;
         }
 
-        /* استایل صفحه بازی */
+        /* استایل صفحه بازی با پس‌زمینه متحرک */
         #game {
             width: 100vw;
             height: 100vh;
             position: relative;
-            background: url('https://i.imgur.com/Wd1kK8X.jpg') no-repeat center center/cover; /* پس‌زمینه بازی */
+            background: linear-gradient(to bottom, #3498db, #aee); /* گرادیانت آبی */
+            overflow: hidden; /* برای جلوگیری از نمایش اسکرول */
+        }
+
+        /* ذرات برف (برای ایجاد حس پویایی) */
+        .snow {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background-color: white;
+            border-radius: 50%;
+            animation: snowfall 3s linear infinite; /* انیمیشن برف */
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
         }
 
         .character {
@@ -74,7 +100,6 @@
             transition: all 0.05s linear;
         }
 
-        /* استایل جوی‌استیک */
         #joystick-zone {
             position: fixed;
             bottom: 30px;
@@ -96,9 +121,10 @@
 <div id="menu">
     <h2>یک شخصیت انتخاب کن:</h2>
     <div style="display: flex;">
-        <div class="character-option" style="background-image: url('https://i.imgur.com/N5uCbDu.gif')" onclick="selectCharacter('https://i.imgur.com/N5uCbDu.gif')"></div>
-        <div class="character-option" style="background-image: url('https://i.imgur.com/OMZZbPd.gif')" onclick="selectCharacter('https://i.imgur.com/OMZZbPd.gif')"></div>
-        <div class="character-option" style="background-image: url('https://i.imgur.com/C3mxpPm.gif')" onclick="selectCharacter('https://i.imgur.com/C3mxpPm.gif')"></div>
+        <div class="character-option" style="background-image: url('https://i.imgur.com/4jNyZ7w.png')" onclick="selectCharacter('https://i.imgur.com/4jNyZ7w.png')"></div>
+        <div class="character-option" style="background-image: url('https://i.imgur.com/kwYR9Bq.png')" onclick="selectCharacter('https://i.imgur.com/kwYR9Bq.png')"></div>
+        <div class="character-option" style="background-image: url('https://i.imgur.com/0j94QBt.png')" onclick="selectCharacter('https://i.imgur.com/0j94QBt.png')"></div>
+        <div class="character-option" style="background-image: url('https://i.imgur.com/DCIRWNd.png')" onclick="selectCharacter('https://i.imgur.com/DCIRWNd.png')"></div>
     </div>
 </div>
 
@@ -112,22 +138,19 @@
     let player = document.getElementById('player');
     let x = 100, y = 100;
     let vx = 0, vy = 0;
-    let isMenuOpen = false; // وضعیت منو
+    let isMenuOpen = false;
 
-    // تابع باز کردن منو
     function openMenu() {
         document.getElementById('menu').style.display = 'flex';
         isMenuOpen = true;
     }
 
-    // تابع انتخاب شخصیت
     function selectCharacter(imageUrl) {
         player.style.backgroundImage = `url('${imageUrl}')`;
-        document.getElementById('menu').style.display = 'none'; // بستن منو
+        document.getElementById('menu').style.display = 'none';
         isMenuOpen = false;
     }
 
-    // به‌روزرسانی موقعیت در هر فریم
     function update() {
         x += vx;
         y += vy;
@@ -136,7 +159,6 @@
         requestAnimationFrame(update);
     }
 
-    // راه‌اندازی جوی‌استیک
     const joystick = nipplejs.create({
         zone: document.getElementById('joystick-zone'),
         mode: 'static',
@@ -156,7 +178,24 @@
         vy = 0;
     });
 
-    // شروع حلقه انیمیشن
+    // ایجاد ذرات برف
+    function createSnow() {
+        const snow = document.createElement('div');
+        snow.classList.add('snow');
+        snow.style.left = Math.random() * 100 + 'vw';
+        snow.style.animationDuration = Math.random() * 3 + 2 + 's';
+        snow.style.opacity = Math.random();
+        document.getElementById('game').appendChild(snow);
+
+        // حذف برف بعد از اتمام انیمیشن
+        snow.addEventListener('animationend', () => {
+            snow.remove();
+        });
+    }
+
+    // ایجاد برف هر 0.5 ثانیه
+    setInterval(createSnow, 500);
+
     update();
 </script>
 </body>

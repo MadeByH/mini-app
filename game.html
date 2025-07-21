@@ -170,7 +170,7 @@
         const rad = data.angle.radian;
         const speed = data.distance * 0.1;
         vx = Math.cos(rad) * speed;
-        vy = Math.sin(rad) * speed;
+        vy = -Math.sin(rad) * speed;
     });
 
     joystick.on('end', () => {

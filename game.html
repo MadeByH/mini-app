@@ -10,6 +10,8 @@
             margin: 0;
             overflow: hidden;
             font-family: sans-serif;
+            background-color: #333; /* پس‌زمینه کلی تیره */
+            color: white;
         }
 
         #settings-button {
@@ -29,7 +31,7 @@
             position: absolute;
             width: 100vw;
             height: 100vh;
-            background: linear-gradient(#bde, #fff);
+            background: linear-gradient(#50a0f0, #ffffff); /* گرادیانت آبی روشن */
             display: none;
             flex-direction: column;
             align-items: center;
@@ -37,19 +39,34 @@
             z-index: 30;
         }
 
+        #menu h2 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: #003366;
+        }
+
+        .character-options-container {
+            display: flex;
+            flex-wrap: wrap; /* برای اینکه در صورت کمبود جا به خط بعد بروند */
+            justify-content: center;
+        }
+
         .character-option {
-            width: 80px;
-            height: 80px;
-            margin: 10px;
+            width: 100px; /* کمی بزرگتر */
+            height: 100px;
+            margin: 15px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
-            border: 2px solid transparent;
+            border: 3px solid transparent;
+            border-radius: 10px; /* گوشه‌های گرد */
             cursor: pointer;
+            transition: border-color 0.3s ease, transform 0.3s ease; /* انیمیشن برای هاور */
         }
 
         .character-option:hover {
-            border-color: #00f;
+            border-color: #ffcc00; /* زرد طلایی برای هاور */
+            transform: scale(1.1); /* کمی بزرگتر شدن */
         }
 
         /* استایل صفحه بازی با پس‌زمینه متحرک */
@@ -57,8 +74,11 @@
             width: 100vw;
             height: 100vh;
             position: relative;
-            background: linear-gradient(to bottom, #3498db, #aee); /* گرادیانت آبی */
-            overflow: hidden; /* برای جلوگیری از نمایش اسکرول */
+            background: linear-gradient(to bottom, #87CEEB, #ADD8E6); /* آسمان آبی */
+            overflow: hidden;
+            display: flex; /* برای قرار دادن UI ها در جای مناسب */
+            align-items: center;
+            justify-content: center;
         }
 
         /* ذرات برف (برای ایجاد حس پویایی) */
@@ -67,64 +87,88 @@
             width: 5px;
             height: 5px;
             background-color: white;
+            opacity: 0.8;
             border-radius: 50%;
-            animation: snowfall 3s linear infinite; /* انیمیشن برف */
+            animation: snowfall linear infinite; /* انیمیشن برف */
+            filter: blur(1px); /* کمی بلور کردن */
         }
 
         @keyframes snowfall {
             0% {
-                transform: translateY(-10px);
+                transform: translateY(-50px) scale(0.8);
                 opacity: 0;
             }
-            10% {
-                opacity: 1;
+            20% {
+                opacity: 0.9;
             }
-            90% {
-                opacity: 1;
+            80% {
+                opacity: 0.9;
             }
             100% {
-                transform: translateY(100vh);
+                transform: translateY(100vh) scale(1.2);
                 opacity: 0;
             }
         }
 
         .character {
-            width: 50px;
-            height: 50px;
+            width: 60px; /* اندازه متوسط */
+            height: 60px;
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
             position: absolute;
-            top: 100px;
-            left: 100px;
-            transition: all 0.05s linear;
+            /* موقعیت اولیه در تابع selectCharacter تنظیم می شود */
+            transition: left 0.05s linear, top 0.05s linear; /* انیمیشن نرم حرکت */
         }
 
         #joystick-zone {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 150px;
-            height: 150px;
+            position: fixed; /* ثابت در صفحه */
+            bottom: 40px;
+            left: 40px;
+            width: 180px;
+            height: 180px;
             z-index: 10;
+            opacity: 0.7; /* کمی شفاف */
+        }
+
+        /* UI وضعیت (حلقه، جان، سکه) */
+        #status-ui {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 15;
+            font-size: 1.2em;
+            display: flex;
+            gap: 20px; /* فاصله بین عناصر UI */
+        }
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .status-item img {
+            width: 30px;
+            height: 30px;
         }
     </style>
 
+    <!-- کتابخانه NippleJS برای جوی استیک -->
     <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.10.1/dist/nipplejs.min.js"></script>
 </head>
 <body>
 
 <!-- دکمه تنظیمات/خانه -->
-<button id="settings-button" onclick="openMenu()">تنظیمات</button>
+<button id="settings-button" onclick="openMenu()">خانه</button>
 
 <!-- منوی انتخاب شخصیت -->
 <div id="menu">
     <h2>یک شخصیت انتخاب کن:</h2>
-    <div style="display: flex;">
-        <div class="character-option" style="background-image: url('https://i.ibb.co/xKgKQZt4/image.png')" onclick="selectCharacter('https://i.ibb.co/xKgKQZt4/image.png')"></div>
-        <div class="character-option" style="background-image: url('https://i.ibb.co/Xf8D4Hgf/image.png')" onclick="selectCharacter('https://i.ibb.co/Xf8D4Hgf/image.png')"></div>
-        <div class="character-option" style="background-image: url('https://i.ibb.co/RGzQH3PG/image.png')" onclick="selectCharacter('https://i.ibb.co/RGzQH3PG/image.png')"></div>
-        <div class="character-option" style="background-image: url('https://i.ibb.co/gMrLT9rP/image.png')" onclick="selectCharacter('https://i.ibb.co/gMrLT9rP/image.png')"></div>
+    <div class="character-options-container">
+        <!-- آدرس عکس ها را باید با عکس های واقعی جایگزین کنید -->
+        <div class="character-option" style="background-image: url('https://i.ibb.co/xKgKQZt4/image.png')" onclick="selectCharacter('sonic')"></div>
+        <div class="character-option" style="background-image: url('https://i.ibb.co/Xf8D4Hgf/image.png')" onclick="selectCharacter('tails')"></div>
+        <div class="character-option" style="background-image: url('https://i.ibb.co/RGzQH3PG/image.png')" onclick="selectCharacter('knuckles')"></div>
+        <div class="character-option" style="background-image: url('https://i.ibb.co/gMrLT9rP/image.png')" onclick="selectCharacter('amy')"></div>
     </div>
 </div>
 
@@ -132,59 +176,154 @@
 <div id="game">
     <div id="player" class="character"></div>
     <div id="joystick-zone"></div>
+    <div id="status-ui">
+        <div class="status-item">
+            <img src="https://img.icons8.com/ios-filled/50/FFFFFF/ring.png" alt="Ring">
+            <span id="rings-count">0</span>
+        </div>
+        <!-- اینجا می توانید جان، گرسنگی و سکه را هم اضافه کنید -->
+        <!-- <div class="status-item">
+            <img src="URL_جان" alt="Health">
+            <span id="health-count">100</span>
+        </div> -->
+    </div>
 </div>
 
 <script>
+    // --- تعریف شخصیت ها ---
+    const characters = {
+        sonic: {
+            imageUrl: 'https://i.ibb.co/xKgKQZt4/image.png', // عکس سونیک
+            initialX: 100, initialY: 100,
+            speedFactor: 0.1, maxSpeed: 5, // ضریب سرعت و حداکثر سرعت
+            specialAbility: 'spin_dash',
+            health: 100, hunger: 100, rings: 0, coins: 0
+        },
+        tails: {
+            imageUrl: 'https://i.ibb.co/Xf8D4Hgf/image.png', // عکس تیلز
+            initialX: 100, initialY: 100,
+            speedFactor: 0.08, maxSpeed: 4,
+            specialAbility: 'fly',
+            health: 80, hunger: 120, rings: 0, coins: 0
+        },
+        knuckles: {
+            imageUrl: 'https://i.ibb.co/RGzQH3PG/image.png', // عکس ناکلز
+            initialX: 100, initialY: 100,
+            speedFactor: 0.09, maxSpeed: 4.5,
+            specialAbility: 'wall_climb', // یا punch
+            health: 120, hunger: 90, rings: 0, coins: 0
+        },
+        amy: {
+            imageUrl: 'https://i.ibb.co/gMrLT9rP/image.png', // عکس اِیمی
+            initialX: 100, initialY: 100,
+            speedFactor: 0.07, maxSpeed: 3.5,
+            specialAbility: 'hammer_throw',
+            health: 90, hunger: 110, rings: 0, coins: 0
+        }
+    };
+
+    let selectedCharacter = null;
     let player = document.getElementById('player');
-    let x = 100, y = 100;
-    let vx = 0, vy = 0;
+    let x = 0, y = 0; // مختصات فعلی بازیکن
+    let vx = 0, vy = 0; // سرعت در محور x و y
+    let currentSpeed = 0; // سرعت فعلی بر اساس ورودی جوی استیک
     let isMenuOpen = false;
 
-    function openMenu() {
-        document.getElementById('menu').style.display = 'flex';
-        isMenuOpen = true;
-    }
+    // --- آیتم های بازی ---
+    let gameObjects = []; // شامل حلقه ها، زمردها، و ...
+    let chaosEmeraldExists = false; // آیا زمرد در صحنه وجود دارد؟
 
-    function selectCharacter(imageUrl) {
-        player.style.backgroundImage = `url('${imageUrl}')`;
-        document.getElementById('menu').style.display = 'none';
-        isMenuOpen = false;
-    }
-
+    // --- تابع اصلی آپدیت بازی ---
     function update() {
+        if (!selectedCharacter) return; // اگر شخصیتی انتخاب نشده، آپدیت نکن
+
+        // حرکت بازیکن
         x += vx;
         y += vy;
+
+        // محدود کردن بازیکن به مرزهای صفحه
+        const playerWidth = player.offsetWidth;
+        const playerHeight = player.offsetHeight;
+        x = Math.max(0, Math.min(x, window.innerWidth - playerWidth));
+        y = Math.max(0, Math.min(y, window.innerHeight - playerHeight));
+
         player.style.left = x + 'px';
         player.style.top = y + 'px';
+
+        // بررسی برخورد با آیتم ها
+        checkCollisions();
+
+        // آپدیت UI وضعیت
+        updateStatusUI();
+
+        // درخواست فریم بعدی
         requestAnimationFrame(update);
     }
 
+    // --- مدیریت منو و انتخاب شخصیت ---
+    function openMenu() {
+        document.getElementById('menu').style.display = 'flex';
+        document.getElementById('settings-button').style.display = 'none'; /* دکمه رو پنهان کن */
+        isMenuOpen = true;
+    }
+
+    function selectCharacter(characterName) {
+        selectedCharacter = characters[characterName];
+        if (!selectedCharacter) return;
+
+        player.style.backgroundImage = `url('${selectedCharacter.imageUrl}')`;
+        x = selectedCharacter.initialX;
+        y = selectedCharacter.initialY;
+        player.style.left = x + 'px';
+        player.style.top = y + 'px';
+
+        document.getElementById('menu').style.display = 'none';
+        document.getElementById('settings-button').style.display = 'block'; /* دکمه رو دوباره نشون بده */
+        isMenuOpen = false;
+
+        initializeLevel(); // شروع مرحله و آیتم ها
+        updateStatusUI(); // آپدیت اولیه UI
+        update(); // شروع حلقه آپدیت بازی
+    }
+
+    // --- مدیریت جوی استیک ---
     const joystick = nipplejs.create({
         zone: document.getElementById('joystick-zone'),
         mode: 'static',
-        position: { left: '75px', bottom: '75px' },
-        color: 'blue'
+        position: { left: '50%', bottom: '50%' }, /* وسط منطقه */
+        color: 'dodgerblue',
+        size: 150, /* اندازه جوی استیک */
+        restOpacity: 0.7
     });
 
     joystick.on('move', (evt, data) => {
+        if (!selectedCharacter) return;
+
         const rad = data.angle.radian;
-        const speed = data.distance * 0.1;
-        vx = Math.cos(rad) * speed;
-        vy = -Math.sin(rad) * speed;
+        const distance = data.distance;
+
+        // تنظیم سرعت بر اساس فاصله جوی استیک و ضریب سرعت شخصیت
+        currentSpeed = Math.min(selectedCharacter.maxSpeed, distance * selectedCharacter.speedFactor * 1.5); // 1.5 برای تنظیم مقیاس
+
+        vx = Math.cos(rad) * currentSpeed;
+        vy = -Math.sin(rad) * currentSpeed; // Y در CSS از بالا به پایینه
     });
 
     joystick.on('end', () => {
         vx = 0;
         vy = 0;
+        currentSpeed = 0;
     });
 
-    // ایجاد ذرات برف
+    // --- مدیریت ذرات برف ---
     function createSnow() {
         const snow = document.createElement('div');
         snow.classList.add('snow');
+        const size = Math.random() * 5 + 3; // اندازه بین 3 تا 8 پیکسل
+        snow.style.width = snow.style.height = size + 'px';
         snow.style.left = Math.random() * 100 + 'vw';
-        snow.style.animationDuration = Math.random() * 3 + 2 + 's';
-        snow.style.opacity = Math.random();
+        snow.style.animationDuration = Math.random() * 3 + 2 + 's'; // سرعت انیمیشن
+        snow.style.opacity = Math.random() * 0.5 + 0.3; // شفافیت
         document.getElementById('game').appendChild(snow);
 
         // حذف برف بعد از اتمام انیمیشن
@@ -193,10 +332,108 @@
         });
     }
 
-    // ایجاد برف هر 0.5 ثانیه
-    setInterval(createSnow, 500);
+    // --- مدیریت آیتم های بازی (حلقه و زمرد) ---
+    function createItem(type, x, y) {
+        const item = {
+            type: type, // 'ring' یا 'chaos_emerald'
+            x: x, y: y,
+            element: null
+        };
 
-    update();
+        const itemElement = document.createElement('div');
+        itemElement.style.position = 'absolute';
+        itemElement.style.left = x + 'px';
+        itemElement.style.top = y + 'px';
+        itemElement.style.width = '35px';
+        itemElement.style.height = '35px';
+        itemElement.style.backgroundSize = 'contain';
+        itemElement.style.backgroundRepeat = 'no-repeat';
+        itemElement.style.backgroundPosition = 'center';
+        itemElement.style.zIndex = '5';
+
+        if (type === 'ring') {
+            itemElement.style.backgroundImage = "url('https://img.icons8.com/ios-filled/50/FFD700/ring.png')"; // آیکون طلایی حلقه
+        } else if (type === 'chaos_emerald') {
+            itemElement.style.backgroundImage = "url('https://img.icons8.com/ios-filled/50/00FFFF/emerald.png')"; // آیکون فیروزه ای زمرد
+            itemElement.style.width = '45px'; // کمی بزرگتر
+            itemElement.style.height = '45px';
+        }
+
+        item.element = itemElement;
+        gameObjects.push(item);
+        document.getElementById('game').appendChild(itemElement);
+    }
+
+    function initializeLevel() {
+        // پاک کردن آیتم های قبلی اگر مرحله ریست می شود
+        gameObjects.forEach(obj => obj.element.remove());
+        gameObjects = [];
+        chaosEmeraldExists = false;
+
+        // ایجاد 25 حلقه
+        for (let i = 0; i < 25; i++) {
+            const randomX = Math.random() * (window.innerWidth - 50);
+            const randomY = Math.random() * (window.innerHeight - 50);
+            createItem('ring', randomX, randomY);
+        }
+
+        // ایجاد یک زمرد در موقعیت تصادفی
+        const emeraldX = Math.random() * (window.innerWidth - 60);
+        const emeraldY = Math.random() * (window.innerHeight - 60);
+        createItem('chaos_emerald', emeraldX, emeraldY);
+        chaosEmeraldExists = true;
+    }
+
+    function checkCollisions() {
+        if (!selectedCharacter) return;
+
+        // مختصات بازیکن به همراه کمی حاشیه برای برخورد بهتر
+        const playerRect = {
+            left: x, top: y,
+            right: x + player.offsetWidth, bottom: y + player.offsetHeight
+        };
+
+        for (let i = gameObjects.length - 1; i >= 0; i--) {
+            const obj = gameObjects[i];
+            const objRect = obj.element.getBoundingClientRect(); // مختصات آیتم
+
+            // چک کردن همپوشانی مستطیل ها
+            if (playerRect.left < objRect.right &&
+                playerRect.right > objRect.left &&
+                playerRect.top < objRect.bottom &&
+                playerRect.bottom > objRect.top) {
+
+                if (obj.type === 'ring') {
+                    selectedCharacter.rings++;
+                    obj.element.remove();
+                    gameObjects.splice(i, 1);
+                    // اینجا می توانیم یک صدای جمع کردن حلقه پخش کنیم
+                } else if (obj.type === 'chaos_emerald') {
+                    // اگر زمرد را جمع کند، حلقه های بیشتری می دهد و شاید قابلیت ویژه فعال شود
+                    selectedCharacter.rings += 100;
+                    chaosEmeraldExists = false; // دیگر زمردی نیست
+                    obj.element.remove();
+                    gameObjects.splice(i, 1);
+                    // اینجا می توانیم یک انیمیشن یا صدای ویژه پخش کنیم
+                    // console.log("زمرد جمع شد!");
+                }
+            }
+        }
+    }
+
+    function updateStatusUI() {
+        if (!selectedCharacter) return;
+        document.getElementById('rings-count').textContent = selectedCharacter.rings;
+        // اینجا می توانید جان، گرسنگی و سکه را هم آپدیت کنید
+    }
+
+    // --- ایجاد ذرات برف (به صورت مداوم) ---
+    setInterval(createSnow, 300); // هر 300 میلی ثانیه یک ذره برف جدید
+
+    // --- شروع اولیه ---
+    // برای اینکه بازی بلافاصله شروع نشود، منوی انتخاب شخصیت را باز می کنیم
+    openMenu();
+
 </script>
 </body>
 </html>

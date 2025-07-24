@@ -198,6 +198,7 @@
     const char = params.get("char");
 
     console.log("User:", uid, name, char);
+    const action = params.get("action");
     // --- تعریف شخصیت ها ---
     const characters = {
         sonic: {
@@ -240,6 +241,14 @@
     // --- آیتم های بازی ---
     let gameObjects = []; // شامل حلقه ها، زمردها، و ...
     let chaosEmeraldExists = false; // آیا زمرد در صحنه وجود دارد؟
+
+    if (action === "map") {
+        openMapMode();
+} else if (action === "battle") {
+        startBattle();
+} else if (action === "mission1") {
+        startMission("collect_rings");
+}
 
     // --- تابع اصلی آپدیت بازی ---
     function update() {
@@ -431,6 +440,89 @@
             }
         }
     }
+
+    function openMapMode() {
+        const mapOverlay = document.createElement("div");
+        mapOverlay.style.position = "absolute";
+        mapOverlay.style.top = 0;
+        mapOverlay.style.left = 0;
+        mapOverlay.style.width = "100vw";
+        mapOverlay.style.height = "100vh";
+        mapOverlay.style.zIndex = 40;
+        mapOverlay.style.background = "rgba(0,0,0,0.8) url('https://i.ibb.co/3s6Zc5V/map-bg.jpg') center/cover no-repeat";
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerText = "❌ بستن نقشه";
+        closeBtn.style.position = "absolute";
+        closeBtn.style.top = "20px";
+        closeBtn.style.left = "50%";
+        closeBtn.style.transform = "translateX(-50%)";
+        closeBtn.style.padding = "10px 15px";
+        closeBtn.style.background = "#ff4444";
+        closeBtn.style.color = "#fff";
+        closeBtn.style.border = "none";
+        closeBtn.style.borderRadius = "6px";
+        closeBtn.style.cursor = "pointer";
+        closeBtn.onclick = () => mapOverlay.remove();
+
+        mapOverlay.appendChild(closeBtn);
+        document.body.appendChild(mapOverlay);
+}
+
+    function startBattle() {
+        alert("👾 نبرد شروع شد! دشمن در راهه...");
+
+        const enemy = document.createElement("div");
+        enemy.style.position = "absolute";
+        enemy.style.top = "150px";
+        enemy.style.right = "50px";
+        enemy.style.width = "70px";
+        enemy.style.height = "70px";
+        enemy.style.backgroundImage = "url('https://i.ibb.co/FhM8QZH/enemy.png')";
+        enemy.style.backgroundSize = "contain";
+        enemy.style.backgroundRepeat = "no-repeat";
+        enemy.style.zIndex = 20;
+        enemy.id = "enemy-boss";
+        document.body.appendChild(enemy);
+
+    // شروع حمله (ساده)
+        setTimeout(() => {
+            enemy.style.transform = "translateX(-300px)";
+            enemy.style.transition = "transform 1s linear";
+    }, 1000);
+
+    // پایان حمله
+        setTimeout(() => {
+            enemy.remove();
+            alert("✅ دشمن شکست خورد! جایزه بگیر!");
+            showRewardButton();
+    }, 4000);
+}
+
+    function startMission(type) {
+        if (type === "collect_rings") {
+            alert("🎯 مأموریت: جمع‌آوری ۳۰ حلقه در ۴۰ ثانیه!");
+
+        // مرحله پاک و دوباره بساز
+            initializeLevel();
+            selectedCharacter.rings = 0;
+            updateStatusUI();
+
+            let missionTimer = 40;
+            const timerInterval = setInterval(() => {
+                missionTimer--;
+                if (missionTimer <= 0) {
+                    clearInterval(timerInterval);
+                    if (selectedCharacter.rings >= 30) {
+                        alert("✅ مأموریت با موفقیت انجام شد!");
+                        showRewardButton();
+                } else {
+                        alert("❌ شکست در مأموریت. دوباره تلاش کن!");
+                }
+            }
+        }, 1000);
+    }
+}
 
     function showRewardButton() {
         const timestamp = Math.floor(Date.now() / 1000); // زمان فعلی

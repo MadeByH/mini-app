@@ -189,6 +189,8 @@
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
 <script>
     const params = new URLSearchParams(window.location.search);
     const uid = params.get("uid");
@@ -431,26 +433,35 @@
     }
 
     function showRewardButton() {
-    // فقط اگر دکمه قبلاً ساخته نشده
-        if (document.getElementById("reward-button")) return;
+        const timestamp = Math.floor(Date.now() / 1000); // زمان فعلی
+        const secret = "SONIC_SECRET"; // همین مقدار رو سمت ربات هم بذار
+        const raw = uid + ":" + selectedCharacter.rings + ":" + secret + ":" + timestamp;
+        const hash = CryptoJS.MD5(raw).toString();
 
-        const rewardButton = document.createElement("a");
-        rewardButton.id = "reward-button";
-        rewardButton.href = `https://web.bale.ai/game_sonic_bot?start=reward_${uid}_rings${selectedCharacter.rings}`;
-        rewardButton.textContent = "🎁 دریافت جایزه در ربات";
-        rewardButton.style.position = "absolute";
-        rewardButton.style.top = "calc(50% + 100px)";
-        rewardButton.style.left = "50%";
-        rewardButton.style.transform = "translate(-50%, -50%)";
-        rewardButton.style.padding = "15px 25px";
-        rewardButton.style.background = "#28a745";
-        rewardButton.style.color = "#fff";
-        rewardButton.style.fontSize = "20px";
-        rewardButton.style.textDecoration = "none";
-        rewardButton.style.borderRadius = "10px";
-        rewardButton.style.zIndex = "999";
-        rewardButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
-        document.body.appendChild(rewardButton);
+        const rewardCode = `reward_${uid}_rings${selectedCharacter.rings}_t${timestamp}_h${hash}`;
+    
+        const copyBtn = document.createElement("button");
+    
+        if (document.getElementById("reward-copy-button")) return; // اگه قبلاً ساخته شده بود، دوباره نسازه
+    
+        copyBtn.textContent = "📋 کپی لینک جایزه";
+        copyBtn.style.position = "absolute";
+        copyBtn.style.bottom = "20px";
+        copyBtn.style.left = "50%";
+        copyBtn.style.transform = "translateX(-50%)";
+        copyBtn.style.padding = "12px 20px";
+        copyBtn.style.fontSize = "16px";
+        copyBtn.style.background = "#17a2b8";
+        copyBtn.style.color = "#fff";
+        copyBtn.style.border = "none";
+        copyBtn.style.borderRadius = "8px";
+        copyBtn.style.cursor = "pointer";
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(`/start ${rewardCode}`);
+            alert("✅ کپی شد! حالا برید تو ربات و پیست کنید.");
+    };
+    
+        document.body.appendChild(copyBtn);
 }
 
     function updateStatusUI() {

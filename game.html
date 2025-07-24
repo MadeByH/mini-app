@@ -190,6 +190,12 @@
 </div>
 
 <script>
+    const params = new URLSearchParams(window.location.search);
+    const uid = params.get("uid");
+    const name = params.get("name");
+    const char = params.get("char");
+
+    console.log("User:", uid, name, char);
     // --- تعریف شخصیت ها ---
     const characters = {
         sonic: {
@@ -417,9 +423,35 @@
                     // اینجا می توانیم یک انیمیشن یا صدای ویژه پخش کنیم
                     // console.log("زمرد جمع شد!");
                 }
+                if (selectedCharacter.rings >= 30) {
+    showRewardButton();
+}
             }
         }
     }
+
+    function showRewardButton() {
+    // فقط اگر دکمه قبلاً ساخته نشده
+        if (document.getElementById("reward-button")) return;
+
+        const rewardButton = document.createElement("a");
+        rewardButton.id = "reward-button";
+        rewardButton.href = `https://ble.ir/YOUR_BOT_USERNAME?start=reward_${uid}_rings${selectedCharacter.rings}`;
+        rewardButton.textContent = "🎁 دریافت جایزه در ربات";
+        rewardButton.style.position = "absolute";
+        rewardButton.style.top = "calc(50% + 100px)";
+        rewardButton.style.left = "50%";
+        rewardButton.style.transform = "translate(-50%, -50%)";
+        rewardButton.style.padding = "15px 25px";
+        rewardButton.style.background = "#28a745";
+        rewardButton.style.color = "#fff";
+        rewardButton.style.fontSize = "20px";
+        rewardButton.style.textDecoration = "none";
+        rewardButton.style.borderRadius = "10px";
+        rewardButton.style.zIndex = "999";
+        rewardButton.style.boxShadow = "0 0 10px rgba(0,0,0,0.5)";
+        document.body.appendChild(rewardButton);
+}
 
     function updateStatusUI() {
         if (!selectedCharacter) return;

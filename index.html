@@ -1,141 +1,205 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>فروشگاه ربات 🤖</title>
+<title>🏪 فروشگاه و خدمات ربات</title>
 <style>
+    :root {
+        --bg-color: #f4f6f9;
+        --text-color: #2c3e50;
+        --card-bg: #fff;
+        --footer-color: #777;
+        --primary-color: #27ae60;
+    }
+
+    body.dark {
+        --bg-color: #1e272e;
+        --text-color: #f5f6fa;
+        --card-bg: #2f3640;
+        --footer-color: #aaa;
+    }
+
     body {
         font-family: Tahoma, sans-serif;
-        background: linear-gradient(135deg, #ece9e6, #fff);
+        background: var(--bg-color);
+        margin: 0; padding: 0;
+        direction: rtl; text-align: right;
+        transition: background 0.3s, color 0.3s;
+    }
+
+    header {
+        position: fixed;
+        top: 0; left: 0; right: 0;
+        background: var(--card-bg);
+        color: var(--text-color);
+        padding: 10px 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        display: flex; justify-content: space-between; align-items: center;
+        z-index: 10;
+    }
+
+    .logo-title {
+        display: flex; align-items: center; gap: 10px;
+    }
+
+    .logo-title img {
+        width: 40px; height: 40px;
+        border-radius: 8px;
+    }
+
+    .logo-title h1 {
+        font-size: 1.2em;
         margin: 0;
-        padding: 0;
-        direction: rtl;
-        text-align: right;
-        color: #2c3e50;
+        color: var(--text-color);
+    }
+
+    .settings-btn {
+        font-size: 1.4em;
+        cursor: pointer;
     }
 
     .container {
-        max-width: 700px;
-        margin: 30px auto;
+        max-width: 600px;
+        margin: 80px auto 40px;
         padding: 25px;
-        background: #fff;
+        background: var(--card-bg);
         border-radius: 15px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-        box-sizing: border-box;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        transition: background 0.3s;
     }
 
-    h1 {
-        font-size: 2.5em;
-        color: #27ae60;
-        margin-bottom: 20px;
+    .menu-btn {
+        display: block; width: 100%;
+        margin: 12px 0; padding: 14px;
         text-align: center;
-    }
-
-    .section {
-        margin-bottom: 35px;
-        padding: 20px;
-        border: 1px solid #dcdde1;
-        border-radius: 12px;
-        background-color: #f4f6f9;
-    }
-
-    .section h2 {
-        font-size: 1.8em;
-        color: #2980b9;
-        margin-bottom: 15px;
-        border-bottom: 2px solid #dfe6e9;
-        padding-bottom: 8px;
-    }
-
-    .section p {
-        font-size: 1.1em;
-        line-height: 1.6;
-    }
-
-    ul, ol {
-        margin-right: 20px;
-        margin-top: 10px;
-        font-size: 1.1em;
-    }
-
-    .button {
-        display: inline-block;
-        margin-top: 15px;
-        padding: 14px 28px;
-        font-size: 1.2em;
-        font-weight: bold;
+        font-size: 1.2em; font-weight: bold;
         text-decoration: none;
-        background-color: #3498db;
-        color: #fff;
-        border-radius: 8px;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        color: #fff; border-radius: 8px;
+        transition: 0.3s;
+        background: var(--primary-color);
     }
 
-    .button:hover {
-        background-color: #2980b9;
-        transform: translateY(-2px);
+    .menu-btn:hover {
+        opacity: 0.9; transform: scale(1.05);
     }
 
     .footer {
-        margin-top: 40px;
-        padding: 15px;
-        border-top: 2px solid #dfe6e9;
-        text-align: center;
-        font-size: 0.95em;
-        color: #636e72;
+        text-align: center; margin-top: 25px;
+        font-size: 0.9em; color: var(--footer-color);
+    }
+
+    /* پنل تنظیمات */
+    .settings-panel {
+        position: fixed; top: 0; right: -300px;
+        width: 270px; height: 100%;
+        background: var(--card-bg);
+        box-shadow: -3px 0 10px rgba(0,0,0,0.2);
+        padding: 20px;
+        transition: 0.3s;
+        z-index: 20;
+    }
+
+    .settings-panel.active { right: 0; }
+
+    .settings-panel h2 {
+        margin-top: 0; font-size: 1.3em; color: var(--text-color);
+    }
+
+    .settings-option { margin: 20px 0; }
+
+    .toggle-btn {
+        cursor: pointer;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 5px;
+    }
+
+    .toggle-btn.dark { background: #2c3e50; color: #fff; }
+    .toggle-btn.light { background: #ecf0f1; color: #2c3e50; }
+
+    .color-palette {
+        display: flex; gap: 10px; margin-top: 10px;
+    }
+
+    .color-circle {
+        width: 30px; height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: 2px solid #ccc;
     }
 </style>
 </head>
 <body>
+<header>
+    <div class="logo-title">
+        <img src="https://i.ibb.co/MmjCz87/Picsart-25-08-03-15-36-42-181.jpg" alt="لوگو">
+        <h1>🏪 فروشگاه و خدمات ربات</h1>
+    </div>
+    <span class="settings-btn" onclick="toggleSettings()">⚙️</span>
+</header>
+
 <div class="container">
-    <h1>فروشگاه ربات 🤖</h1>
+    <a href="coins.html" class="menu-btn">💰 خرید سکه</a>
+    <a href="ads.html" class="menu-btn">📢 تعرفه تبلیغات</a>
+    <a href="guide.html" class="menu-btn">📖 راهنما</a>
+    <a href="links.html" class="menu-btn">🔗 کانال‌ها و ربات‌ها</a>
 
-    <div class="section">
-        <h2>خرید سکه 🪙</h2>
-        <p>با خرید سکه، از امکانات ویژه و مزایای کامل ربات بهره‌مند شوید. هم‌اکنون اقدام کنید و تجربه بهتری داشته باشید.</p>
-        <a href="#" class="button" onclick="buyCoins()">خرید ۵۰ سکه</a>
+    <div class="footer">&copy; 2025 فروشگاه و خدمات ربات</div>
+</div>
+
+<div class="settings-panel" id="settingsPanel">
+    <h2>⚙️ تنظیمات</h2>
+
+    <div class="settings-option">
+        <p>حالت نمایش:</p>
+        <button class="toggle-btn light" onclick="setTheme('light')">☀️ روز</button>
+        <button class="toggle-btn dark" onclick="setTheme('dark')">🌙 شب</button>
     </div>
 
-    <div class="section">
-        <h2>تعرفه تبلیغات</h2>
-        <p>برای تبلیغ در مینی اپ یا ربات، تعرفه‌های زیر را بررسی کنید:</p>
-        <ul>
-            <li>تبلیغ بنری: 75,000 تومان</li>
-            <li>تبلیغ متنی: 65,000 تومان</li>
-            <li>تبلیغ رسانه‌ای: 85,000 تومان</li>
-        </ul>
-        <p>تبلیغات به صورت دسته‌جمعی و به کل کاربران ربات‌ ارسال می‌شود. برای هماهنگی و سفارش، با پشتیبانی تماس بگیرید:</p>
-        <a href="https://ble.ir/hello_bots" class="button">سفارش تبلیغ</a>
-    </div>
-
-    <div class="section">
-        <h2>راهنما</h2>
-        <p>برای استفاده بهتر از مینی اپ، مراحل زیر را دنبال کنید:</p>
-        <ol>
-            <li>ثبت نام در برنامه</li>
-            <li>انتخاب سکه و پرداخت</li>
-            <li>شروع استفاده از امکانات و تبلیغات</li>
-        </ol>    
-        <a href="guide.html" class="button">مشاهده کامل راهنما</a>
-    </div>    <div class="section">
-        <h2>کانال‌ها و ربات‌ها</h2>
-        <p>به کانال‌ها و ربات‌های ما بپیوندید:</p>
-        <a href="https://t.me/channel_chatgpt_openai" class="button">کانال تلگرام</a>
-        <a href="https://t.me/Members_and_Manage_Bot" class="button">ربات تلگرام</a>
-        <a href="https://ble.ir/add_members_bot" class="button">ربات بله</a>
-        <a href="https://ble.ir/channel_member_and_manager_bot" class="button">کانال بله</a>
-    </div>
-
-    <div class="footer">
-        <p>&copy; 2025 فروشگاه ربات. کلیه حقوق محفوظ است.</p>
+    <div class="settings-option">
+        <p>رنگ اصلی:</p>
+        <div class="color-palette">
+            <div class="color-circle" style="background:#27ae60" onclick="setColor('#27ae60')"></div>
+            <div class="color-circle" style="background:#3498db" onclick="setColor('#3498db')"></div>
+            <div class="color-circle" style="background:#9b59b6" onclick="setColor('#9b59b6')"></div>
+            <div class="color-circle" style="background:#e67e22" onclick="setColor('#e67e22')"></div>
+            <div class="color-circle" style="background:#e74c3c" onclick="setColor('#e74c3c')"></div>
+        </div>
     </div>
 </div>
 
 <script>
-    function buyCoins() {
-        alert("✅ خرید ۵۰ سکه با موفقیت انجام شد!\nبرای خرید واقعی، به ربات برگشته، سپس به بخش مدیریت سکه بروید و آنجا خرید تان را انجام دهید.");
+    const settingsPanel = document.getElementById("settingsPanel");
+
+    function toggleSettings() {
+        settingsPanel.classList.toggle("active");
+    }
+
+    function setTheme(mode) {
+        if (mode === "dark") {
+            document.body.classList.add("dark");
+            localStorage.setItem("theme", "dark");
+        } else {
+            document.body.classList.remove("dark");
+            localStorage.setItem("theme", "light");
+        }
+    }
+
+    function setColor(color) {
+        document.documentElement.style.setProperty("--primary-color", color);
+        localStorage.setItem("primaryColor", color);
+    }
+
+    // بازیابی تنظیمات ذخیره‌شده
+    window.onload = function() {
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme === "dark") document.body.classList.add("dark");
+
+        const savedColor = localStorage.getItem("primaryColor");
+        if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
     }
 </script>
 </body>

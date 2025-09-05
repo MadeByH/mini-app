@@ -8,7 +8,7 @@
     body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }
     .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
     h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }
-    .button { display: block; width: 100%; margin: 12px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; }
+    .button { display: block; width: 100%; margin: 12px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s; cursor: pointer; }
     .button:hover { background: #2980b9; }
     .back-btn { background: #7f8c8d; }
     .back-btn:hover { background: #636e72; }
@@ -18,16 +18,25 @@
 <div class="container">
     <h1>🔗 کانال‌ها و ربات‌ها</h1>
 
-    <!-- تلگرام -->
-    <a href="tg://resolve?domain=channel_chatgpt_openai" class="button">📢 کانال تلگرام</a>
-    <a href="tg://resolve?domain=Members_and_Manage_Bot" class="button">🤖 ربات تلگرام</a>
-
-    <!-- بله -->
-    <a href="ble.ir/add_members_bot" class="button">🤖 ربات بله</a>
-    <a href="ble.ir/channel_member_and_manager_bot" class="button">📢 کانال بله</a>
+    <button class="button" onclick="openLink('https://t.me/channel_chatgpt_openai')">📢 کانال تلگرام</button>
+    <button class="button" onclick="openLink('https://t.me/Members_and_Manage_Bot')">🤖 ربات تلگرام</button>
+    <button class="button" onclick="openLink('https://ble.ir/add_members_bot')">🤖 ربات بله</button>
+    <button class="button" onclick="openLink('https://ble.ir/channel_member_and_manager_bot')">📢 کانال بله</button>
 
     <!-- دکمه بازگشت -->
-    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
+    <button class="button back-btn" onclick="openLink('index.html')">🔙 بازگشت به صفحه اصلی</button>
 </div>
+
+<script>
+function openLink(url) {
+    if (window.BaleWebApp) {
+        // بستن مینی اپ و باز کردن لینک داخل بله
+        window.BaleWebApp.openLink(url);
+    } else {
+        // fallback برای مرورگر
+        window.location.href = url;
+    }
+}
+</script>
 </body>
 </html>

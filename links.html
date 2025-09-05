@@ -27,14 +27,13 @@
     <button class="button back-btn" onclick="openLink('index.html')">🔙 بازگشت به صفحه اصلی</button>
 </div>
 
+<script src="https://static.bale.ai/webapp/v1.js"></script>
 <script>
 function openLink(url) {
-    if (window.BaleWebApp) {
-        // بستن مینی اپ و باز کردن لینک داخل بله
-        window.BaleWebApp.openLink(url);
+    if (window.BaleWebApp && typeof window.BaleWebApp.openLink === "function") {
+        window.BaleWebApp.openLink(url); // 📌 در مینی‌اپ بله
     } else {
-        // fallback برای مرورگر
-        window.location.href = url;
+        window.open(url, "_blank"); // 📌 برای مرورگر عادی
     }
 }
 </script>

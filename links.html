@@ -17,28 +17,28 @@
     .help-text a { color: #27ae60; text-decoration: none; font-weight: bold; margin: 0 5px; } /* اضافه شدن margin */
     .help-text a:hover { text-decoration: underline; }
 
-    /* استایل جدید برای دکمه کپی */
+    /* استایل دکمه کپی */
     .copy-button {
-        background-color: #f0f0f0; /* رنگ زمینه روشن */
-        color: #333; /* رنگ متن */
-        border: 1px solid #ccc; /* حاشیه */
-        border-radius: 4px; /* گوشه‌های گرد */
-        padding: 5px 8px; /* پدینگ داخلی */
-        font-size: 0.8em; /* اندازه فونت کوچکتر */
-        cursor: pointer; /* نشانگر ماوس */
-        transition: background-color 0.2s ease; /* انیمیشن نرم */
-        margin-right: 5px; /* فاصله از لینک */
-        display: inline-flex; /* برای تراز کردن آیکون و متن */
+        background-color: #f0f0f0;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 8px;
+        font-size: 0.8em;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-right: 5px;
+        display: inline-flex;
         align-items: center;
-        gap: 4px; /* فاصله بین آیکون و متن */
+        gap: 4px;
     }
     .copy-button:hover {
-        background-color: #e0e0e0; /* تغییر رنگ در هاور */
+        background-color: #e0e0e0;
     }
-    /* آیکون کپی (میتونید از SVG یا فونت آیکون هم استفاده کنید) */
+    /* آیکون کپی */
     .copy-button::before {
-        content: "📋"; /* شکل مداد برای کپی (یا میتونید از &#x2398; برای نماد کپی استفاده کنید) */
-        font-size: 1em; /* اندازه آیکون */
+        content: "📋"; /* نماد کپی */
+        font-size: 1em;
         line-height: 1;
     }
 </style>
@@ -47,22 +47,7 @@
 <div class="container">
     <h1>🔗 کانال‌ها و ربات‌ها</h1>
 
-    <!-- لینک‌های مستقیم تلگرام -->
-    <a href="https://t.me/channel_chatgpt_openai" class="button">📢 کانال تلگرام</a>
-    <div class="help-text">
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
-        <a id="telegram-channel-link" href="https://t.me/channel_chatgpt_openai" target="_blank">https://t.me/channel_chatgpt_openai</a>
-        <button class="copy-button" onclick="copyLink('telegram-channel-link')">کپی</button>
-    </div>
-
-    <a href="https://t.me/Members_and_Manage_Bot" class="button">🤖 ربات تلگرام</a>
-    <div class="help-text">
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
-        <a id="telegram-bot-link" href="https://t.me/Members_and_Manage_Bot" target="_blank">https://t.me/Members_and_Manage_Bot</a>
-        <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>
-    </div>
-
-    <!-- لینک‌های بله با startapp -->
+    <!-- لینک‌های بله (اول قرار گرفتند) -->
     <a href="https://ble.ir/add_members_bot?startapp" class="button">🤖 ربات بله</a>
     <div class="help-text">
         <span>اگر ربات بله باز نشد، از این لینک استفاده کنید:</span>
@@ -77,6 +62,37 @@
         <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>
     </div>
 
+    <!-- لینک‌های تلگرام -->
+    <a href="https://t.me/channel_members_and_manage_bot" class="button">📢 کانال تلگرام</a>
+    <div class="help-text">
+        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
+        <a id="telegram-channel-link" href="https://t.me/channel_members_and_manage_bot" target="_blank">https://t.me/channel_members_and_manage_bot</a>
+        <button class="copy-button" onclick="copyLink('telegram-channel-link')">کپی</button>
+    </div>
+
+    <a href="https://t.me/Members_and_Manage_Bot" class="button">🤖 ربات تلگرام</a>
+    <div class="help-text">
+        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
+        <a id="telegram-bot-link" href="https://t.me/Members_and_Manage_Bot" target="_blank">https://t.me/Members_and_Manage_Bot</a>
+        <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>
+    </div>
+
+    <!-- لینک‌های ایتا -->
+    <a href="https://eitaa.com/bot_add_members" class="button">📢 کانال ایتا</a>
+    <div class="help-text">
+        <span>اگر کانال ایتا باز نشد، از این لینک استفاده کنید:</span>
+        <a id="eitaa-channel-link" href="https://eitaa.com/bot_add_members" target="_blank">https://eitaa.com/bot_add_members</a>
+        <button class="copy-button" onclick="copyLink('eitaa-channel-link')">کپی</button>
+    </div>
+
+    <!-- لینک‌های روبیکا -->
+    <a href="https://rubika.ir/Made_by_H_M" class="button">📢 کانال روبیکا</a>
+    <div class="help-text">
+        <span>اگر کانال روبیکا باز نشد، از این لینک استفاده کنید:</span>
+        <a id="rubika-channel-link" href="https://rubika.ir/Made_by_H_M" target="_blank">https://rubika.ir/Made_by_H_M</a>
+        <button class="copy-button" onclick="copyLink('rubika-channel-link')">کپی</button>
+    </div>
+
     <!-- دکمه بازگشت -->
     <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
 </div>
@@ -84,20 +100,32 @@
 <script>
     function copyLink(elementId) {
         const linkElement = document.getElementById(elementId);
-        const linkToCopy = linkElement.href; // گرفتن خود URL از ویژگی href
+        const linkToCopy = linkElement.href;
 
-        // برای کپی کردن متن به کلیپ‌بورد، از API navigator.clipboard استفاده می‌کنیم.
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(linkToCopy).then(() => {
-                alert('لینک کپی شد: ' + linkToCopy);
-                // میتونید به جای alert، یک پیام موقت خوشگل‌تر نشون بدید
+                // نمایش پیام موفقیت آمیز به کاربر
+                const successMessage = document.createElement('div');
+                successMessage.textContent = 'لینک با موفقیت کپی شد!';
+                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
+                document.body.appendChild(successMessage);
+
+                function fadeInOut() {
+                    successMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        successMessage.style.opacity = '0';
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 1000); // زمان برای محو شدن
+                    }, 2000); // نمایش پیام برای 2 ثانیه
+                }
+                fadeInOut();
+
             }).catch(err => {
                 console.error('خطا در کپی کردن لینک: ', err);
-                // اگر API کلیپ‌بورد در دسترس نبود (مثلاً در برخی محیط‌های مینی‌اپ یا مرورگرهای قدیمی)
                 fallbackCopyTextToClipboard(linkToCopy);
             });
         } else {
-            // روش جایگزین برای مرورگرهای قدیمی یا محیط‌هایی که API کلیپ‌بورد ندارن
             fallbackCopyTextToClipboard(linkToCopy);
         }
     }
@@ -105,7 +133,6 @@
     function fallbackCopyTextToClipboard(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
-        // از دید کاربر پنهانش می‌کنیم
         textArea.style.position = "fixed";
         textArea.style.top = "0";
         textArea.style.left = "0";
@@ -120,9 +147,24 @@
         textArea.focus();
         textArea.select();
         try {
-            const successful = document.execCommand('copy');
-            const msg = successful ? 'موفق' : 'ناموفق';
-            alert('لینک کپی شد (با روش جایگزین): ' + text);
+            document.execCommand('copy');
+            // نمایش پیام موفقیت آمیز در حالت fallback
+            const successMessage = document.createElement('div');
+            successMessage.textContent = 'لینک با موفقیت کپی شد! (روش جایگزین)';
+            successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #f39c12; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
+            document.body.appendChild(successMessage);
+
+            function fadeInOut() {
+                successMessage.style.opacity = '1';
+                setTimeout(() => {
+                    successMessage.style.opacity = '0';
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 1000);
+                }, 2000);
+            }
+            fadeInOut();
+
         } catch (err) {
             console.error('امکان کپی کردن وجود ندارد.', err);
             alert('خطا در کپی کردن لینک. لطفا به صورت دستی کپی کنید: ' + text);

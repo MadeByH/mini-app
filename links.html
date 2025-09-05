@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>🔗 کانال‌ها و ربات‌ها</title>
 <style>
-    body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }
+    body { font-family: Tahoma, sans-serif; background: #f4f6f9; margin: 0; padding: 0; direction: rtl; text-align: right; }
     .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-    h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }
-    .button { display: block; width: 100%; margin: 12px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; border: none; border-radius: 8px; font-weight: bold; transition: 0.3s; cursor: pointer; }
+    h1 { text-align: center; color: #27ae60; margin-bottom: 20px; }
+    .button { display: block; width: 100%; margin: 12px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; }
     .button:hover { background: #2980b9; }
     .back-btn { background: #7f8c8d; }
     .back-btn:hover { background: #636e72; }
@@ -18,24 +18,21 @@
 <div class="container">
     <h1>🔗 کانال‌ها و ربات‌ها</h1>
 
-    <button class="button" onclick="openLink('https://t.me/channel_chatgpt_openai')">📢 کانال تلگرام</button>
-    <button class="button" onclick="openLink('https://t.me/Members_and_Manage_Bot')">🤖 ربات تلگرام</button>
-    <button class="button" onclick="openLink('https://ble.ir/add_members_bot')">🤖 ربات بله</button>
-    <button class="button" onclick="openLink('https://ble.ir/channel_member_and_manager_bot')">📢 کانال بله</button>
+    <!-- دکمه‌هایی که فقط دستور می‌فرستن -->
+    <button class="button" onclick="sendToBot('open_channel')">📢 کانال بله</button>
+    <button class="button" onclick="sendToBot('open_robot')">🤖 ربات بله</button>
 
-    <!-- دکمه بازگشت -->
-    <button class="button back-btn" onclick="openLink('index.html')">🔙 بازگشت به صفحه اصلی</button>
+    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
 </div>
 
-<script src="https://static.bale.ai/webapp/v1.js"></script>
 <script>
-function openLink(url) {
-    if (window.BaleWebApp && typeof window.BaleWebApp.openLink === "function") {
-        window.BaleWebApp.openLink(url); // 📌 در مینی‌اپ بله
-    } else {
-        window.open(url, "_blank"); // 📌 برای مرورگر عادی
+    function sendToBot(action) {
+        if (window.BaleWebApp) {
+            window.BaleWebApp.sendData(action);
+        } else {
+            alert("❌ امکان ارسال به ربات وجود ندارد.");
+        }
     }
-}
 </script>
 </body>
 </html>

@@ -89,6 +89,28 @@
         font-size: 0.9em; color: var(--footer-color);
     }
 
+    /* تبلیغات */
+    .ads-section {
+      margin-top: 30px;
+      padding: 15px;
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    .ad-box {
+      padding: 12px;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      background: #f9f9f9;
+      text-align: center;
+      color: #333;
+    }
+    .ad-box img, .ad-box video {
+      max-width: 100%;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+
     /* پنل تنظیمات */
     .settings-panel {
         position: fixed; top: 0; right: -300px;
@@ -147,6 +169,14 @@
     <a href="guide.html" class="menu-btn">📖 راهنما</a>
     <a href="links.html" class="menu-btn">🔗 کانال‌ها و ربات‌ها</a>
 
+    <!-- 📢 تبلیغات -->
+    <div class="ads-section" id="adsSection">
+      <h2>📢 تبلیغات</h2>
+      <div class="ad-box" id="adBox">
+        <p>در حال بارگذاری تبلیغات...</p>
+      </div>
+    </div>
+
     <div class="footer">&copy; 2025 فروشگاه و خدمات ربات</div>
 </div>
 
@@ -172,35 +202,75 @@
 </div>
 
 <script>
-    const settingsPanel = document.getElementById("settingsPanel");
+// تبلیغات
+let ads = JSON.parse(localStorage.getItem("ads") || "[]");
 
-    function toggleSettings() {
-        settingsPanel.classList.toggle("active");
+if (ads.length === 0) {
+  ads = [
+    { type: "text", text: "🚀 خرید سکه با تخفیف ویژه!", link: "coins.html" },
+    { type: "image", src: "sample-ad.png", link: "ads.html" },
+    { type: "video", src: "sample-ad.mp4", link: "guide.html" }
+  ];
+}
+
+function showRandomAd() {
+  const adBox = document.getElementById("adBox");
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];
+
+  let html = "";
+  if (randomAd.type === "text") {
+    html = `<a href="${randomAd.link}" target="_blank">${randomAd.text}</a>`;
+  } else if (randomAd.type === "image") {
+    html = `<a href="${randomAd.link}" target="_blank">
+              <img src="${randomAd.src}" alt="ad">
+            </a>`;
+  } else if (randomAd.type === "video") {
+    html = `<video controls>
+              <source src="${randomAd.src}" type="video/mp4">
+              مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+            </video>
+            <p><a href="${randomAd.link}" target="_blank">🔗 مشاهده بیشتر</a></p>`;
+  }
+
+  let views = parseInt(localStorage.getItem("adViews") || "0");
+  views++;
+  localStorage.setItem("adViews", views);
+
+  adBox.innerHTML = html + `<p style="font-size:0.8em;color:gray;">👁 بازدید: ${views}</p>`;
+}
+
+showRandomAd();
+setInterval(showRandomAd, 30000);
+
+// تنظیمات
+const settingsPanel = document.getElementById("settingsPanel");
+
+function toggleSettings() {
+    settingsPanel.classList.toggle("active");
+}
+
+function setTheme(mode) {
+    if (mode === "dark") {
+        document.body.classList.add("dark");
+        localStorage.setItem("theme", "dark");
+    } else {
+        document.body.classList.remove("dark");
+        localStorage.setItem("theme", "light");
     }
+}
 
-    function setTheme(mode) {
-        if (mode === "dark") {
-            document.body.classList.add("dark");
-            localStorage.setItem("theme", "dark");
-        } else {
-            document.body.classList.remove("dark");
-            localStorage.setItem("theme", "light");
-        }
-    }
+function setColor(color) {
+    document.documentElement.style.setProperty("--primary-color", color);
+    localStorage.setItem("primaryColor", color);
+}
 
-    function setColor(color) {
-        document.documentElement.style.setProperty("--primary-color", color);
-        localStorage.setItem("primaryColor", color);
-    }
+window.onload = function() {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme === "dark") document.body.classList.add("dark");
 
-    // بازیابی تنظیمات ذخیره‌شده
-    window.onload = function() {
-        const savedTheme = localStorage.getItem("theme");
-        if (savedTheme === "dark") document.body.classList.add("dark");
-
-        const savedColor = localStorage.getItem("primaryColor");
-        if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
-    }
+    const savedColor = localStorage.getItem("primaryColor");
+    if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
+}
 </script>
 </body>
 </html>

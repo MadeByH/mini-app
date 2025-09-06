@@ -15,6 +15,7 @@
     .help-text { font-size: 0.9em; color: #555; text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
     .help-text a { color: #27ae60; text-decoration: none; font-weight: bold; margin: 0 5px; }
     .help-text a:hover { text-decoration: underline; }
+
     .copy-button {
         background-color: #f0f0f0;
         color: #333;
@@ -31,6 +32,15 @@
     }
     .copy-button:hover { background-color: #e0e0e0; }
     .copy-button::before { content: "📋"; font-size: 1em; line-height: 1; }
+
+    /* ✅ همه لوگوها یک اندازه */
+    .icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        vertical-align: middle;
+        margin-left: 8px;
+    }
 </style>
 </head>
 <body>
@@ -39,8 +49,7 @@
 
     <!-- لینک‌های بله -->
     <a href="https://ble.ir/add_members_bot?startapp" class="button">
-        <img src="bale.png" alt="بله" style="height:20px; vertical-align:middle; margin-left:8px;">
-        ربات بله
+        <img src="bale.png" alt="بله" class="icon"> ربات بله
     </a>
     <div class="help-text">
         <span>اگر ربات بله باز نشد، از این لینک استفاده کنید:</span>
@@ -49,8 +58,7 @@
     </div>
 
     <a href="https://ble.ir/channel_member_and_manager_bot?startapp" class="button">
-        <img src="bale.png" alt="بله" style="height:20px; vertical-align:middle; margin-left:8px;">
-        کانال بله
+        <img src="bale.png" alt="بله" class="icon"> کانال بله
     </a>
     <div class="help-text">
         <span>اگر کانال بله باز نشد، از این لینک استفاده کنید:</span>
@@ -58,10 +66,9 @@
         <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>
     </div>
 
-    <!-- تلگرام -->
+    <!-- لینک‌های تلگرام -->
     <a href="https://t.me/channel_members_and_manage_bot" class="button">
-        <img src="telegram.png" alt="تلگرام" style="height:20px; vertical-align:middle; margin-left:8px;">
-        کانال تلگرام
+        <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام
     </a>
     <div class="help-text">
         <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
@@ -70,8 +77,7 @@
     </div>
 
     <a href="https://t.me/Members_and_Manage_Bot" class="button">
-        <img src="telegram.png" alt="تلگرام" style="height:20px; vertical-align:middle; margin-left:8px;">
-        ربات تلگرام
+        <img src="telegram.png" alt="تلگرام" class="icon"> ربات تلگرام
     </a>
     <div class="help-text">
         <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
@@ -79,10 +85,9 @@
         <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>
     </div>
 
-    <!-- ایتا -->
+    <!-- لینک‌های ایتا -->
     <a href="https://eitaa.com/bot_add_members" class="button">
-        <img src="eitaa.png" alt="ایتــا" style="height:20px; vertical-align:middle; margin-left:8px;">
-        کانال ایتا
+        <img src="eitaa.png" alt="ایتــا" class="icon"> کانال ایتا
     </a>
     <div class="help-text">
         <span>اگر کانال ایتا باز نشد، از این لینک استفاده کنید:</span>
@@ -90,10 +95,9 @@
         <button class="copy-button" onclick="copyLink('eitaa-channel-link')">کپی</button>
     </div>
 
-    <!-- روبیکا -->
+    <!-- لینک‌های روبیکا -->
     <a href="https://rubika.ir/channel_members_and_manage_bot" class="button">
-        <img src="rubika.png" alt="روبیکا" style="height:20px; vertical-align:middle; margin-left:8px;">
-        کانال روبیکا
+        <img src="rubika.png" alt="روبیکا" class="icon"> کانال روبیکا
     </a>
     <div class="help-text">
         <span>اگر کانال روبیکا باز نشد، از این لینک استفاده کنید:</span>
@@ -112,7 +116,19 @@
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(linkToCopy).then(() => {
-                showMessage('لینک با موفقیت کپی شد!', '#27ae60');
+                const successMessage = document.createElement('div');
+                successMessage.textContent = 'لینک با موفقیت کپی شد!';
+                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
+                document.body.appendChild(successMessage);
+
+                function fadeInOut() {
+                    successMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        successMessage.style.opacity = '0';
+                        setTimeout(() => { successMessage.remove(); }, 1000);
+                    }, 2000);
+                }
+                fadeInOut();
             }).catch(err => {
                 console.error('خطا در کپی کردن لینک: ', err);
                 fallbackCopyTextToClipboard(linkToCopy);
@@ -125,37 +141,15 @@
     function fallbackCopyTextToClipboard(text) {
         const textArea = document.createElement("textarea");
         textArea.value = text;
-        textArea.style.position = "fixed";
-        textArea.style.opacity = "0";
         document.body.appendChild(textArea);
-        textArea.focus();
         textArea.select();
         try {
             document.execCommand('copy');
-            showMessage('لینک با موفقیت کپی شد! (روش جایگزین)', '#f39c12');
+            alert('لینک با موفقیت کپی شد! (روش جایگزین)');
         } catch (err) {
-            console.error('امکان کپی کردن وجود ندارد.', err);
-            alert('خطا در کپی کردن لینک. لطفا به صورت دستی کپی کنید: ' + text);
+            alert('خطا در کپی کردن لینک: ' + text);
         }
         document.body.removeChild(textArea);
-    }
-
-    function showMessage(text, bgColor) {
-        const successMessage = document.createElement('div');
-        successMessage.textContent = text;
-        successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: '+bgColor+'; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
-        document.body.appendChild(successMessage);
-
-        function fadeInOut() {
-            successMessage.style.opacity = '1';
-            setTimeout(() => {
-                successMessage.style.opacity = '0';
-                setTimeout(() => {
-                    successMessage.remove();
-                }, 1000);
-            }, 2000);
-        }
-        fadeInOut();
     }
 </script>
 </body>

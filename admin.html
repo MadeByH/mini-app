@@ -5,12 +5,16 @@
 <title>پنل ادمین تبلیغات</title>
 <style>
 body { font-family: Tahoma; background:#f4f6f9; direction:rtl; padding:20px; }
-.container { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+.container { max-width:700px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
 h1 { text-align:center; color:#27ae60; }
 label { display:block; margin-top:15px; }
 input, select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:8px; }
-button { margin-top:20px; padding:12px; width:100%; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1.1em; }
+button { margin-top:20px; padding:12px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1em; }
 button:hover { background:#219150; }
+.ad-list { margin-top:30px; }
+.ad-item { padding:12px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.delete-btn { background:#e74c3c; padding:6px 12px; border:none; border-radius:6px; color:#fff; cursor:pointer; }
+.delete-btn:hover { background:#c0392b; }
 </style>
 </head>
 <body>
@@ -30,6 +34,11 @@ button:hover { background:#219150; }
   <input type="text" id="adLink" placeholder="https://example.com"/>
 
   <button onclick="saveAd()">➕ افزودن تبلیغ</button>
+
+  <div class="ad-list" id="adList">
+    <h2>📋 لیست تبلیغات</h2>
+    <div id="adsContainer"></div>
+  </div>
 </div>
 
 <script>
@@ -53,8 +62,52 @@ function saveAd() {
   }
 
   localStorage.setItem("ads", JSON.stringify(ads));
+  document.getElementById("adContent").value = "";
+  document.getElementById("adLink").value = "";
+  loadAds();
   alert("✅ تبلیغ ذخیره شد!");
 }
+
+function deleteAd(index) {
+  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
+  ads.splice(index, 1);
+  localStorage.setItem("ads", JSON.stringify(ads));
+  loadAds();
+}
+
+function loadAds() {
+  const adsContainer = document.getElementById("adsContainer");
+  adsContainer.innerHTML = "";
+  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
+
+  if (ads.length === 0) {
+    adsContainer.innerHTML = "<p>هیچ تبلیغی ثبت نشده است.</p>";
+    return;
+  }
+
+  ads.forEach((ad, index) => {
+    let adText = "";
+    if (ad.type === "text") {
+      adText = `📝 متن: ${ad.text}`;
+    } else if (ad.type === "image") {
+      adText = `🖼 عکس: ${ad.src}`;
+    } else if (ad.type === "video") {
+      adText = `🎬 ویدیو: ${ad.src}`;
+    }
+
+    adsContainer.innerHTML += `
+      <div class="ad-item">
+        <div>
+          ${adText}<br>🔗 لینک: ${ad.link}
+        </div>
+        <button class="delete-btn" onclick="deleteAd(${index})">❌ حذف</button>
+      </div>
+    `;
+  });
+}
+
+// بارگذاری اولیه لیست تبلیغات
+loadAds();
 </script>
 </body>
 </html>

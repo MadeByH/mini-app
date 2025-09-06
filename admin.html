@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>پنل ادمین تبلیغات</title>
+<style>
+body { font-family: Tahoma; background:#f4f6f9; direction:rtl; padding:20px; }
+.container { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:12px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
+h1 { text-align:center; color:#27ae60; }
+label { display:block; margin-top:15px; }
+input, select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc; border-radius:8px; }
+button { margin-top:20px; padding:12px; width:100%; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1.1em; }
+button:hover { background:#219150; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📢 مدیریت تبلیغات</h1>
+  <label>نوع تبلیغ:</label>
+  <select id="adType">
+    <option value="text">متنی</option>
+    <option value="image">عکس</option>
+    <option value="video">ویدیو</option>
+  </select>
+
+  <label>متن یا آدرس فایل:</label>
+  <input type="text" id="adContent" placeholder="متن تبلیغ یا لینک فایل"/>
+
+  <label>لینک مقصد:</label>
+  <input type="text" id="adLink" placeholder="https://example.com"/>
+
+  <button onclick="saveAd()">➕ افزودن تبلیغ</button>
+</div>
+
+<script>
+function saveAd() {
+  const type = document.getElementById("adType").value;
+  const content = document.getElementById("adContent").value.trim();
+  const link = document.getElementById("adLink").value.trim();
+
+  if (!content || !link) {
+    alert("⚠️ لطفا همه فیلدها را پر کنید!");
+    return;
+  }
+
+  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
+  if (type === "text") {
+    ads.push({ type: "text", text: content, link });
+  } else if (type === "image") {
+    ads.push({ type: "image", src: content, link });
+  } else if (type === "video") {
+    ads.push({ type: "video", src: content, link });
+  }
+
+  localStorage.setItem("ads", JSON.stringify(ads));
+  alert("✅ تبلیغ ذخیره شد!");
+}
+</script>
+</body>
+</html>

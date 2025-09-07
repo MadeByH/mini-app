@@ -12,17 +12,25 @@ input, select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc;
 button { margin-top:20px; padding:12px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1em; }
 button:hover { background:#219150; }
 .ad-list { margin-top:30px; }
-.ad-item { padding:12px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; }
-.ad-info { flex-grow: 1; margin-left: 15px; }
+.ad-item { padding:12px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap: wrap; }
+.ad-info { flex-grow: 1; }
 .ad-stats { font-size: 0.9em; color: #555; margin-top: 8px; }
 .ad-stats span { margin-left: 15px; }
 .delete-btn { background:#e74c3c; padding:6px 12px; border:none; border-radius:6px; color:#fff; cursor:pointer; }
 .delete-btn:hover { background:#c0392b; }
-.ad-item div:first-child { display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
+.ad-preview img, .ad-preview video { max-width:150px; border-radius:6px; margin-top:8px; }
+.hidden { display:none; }
 </style>
 </head>
 <body>
-<div class="container">
+<div class="container" id="loginBox">
+  <h1>🔑 ورود ادمین</h1>
+  <label>کلید ادمین:</label>
+  <input type="password" id="adminKey" placeholder="کلید را وارد کنید"/>
+  <button onclick="login()">ورود</button>
+</div>
+
+<div class="container hidden" id="adminPanel">
   <h1>📢 مدیریت تبلیغات</h1>
   <label>نوع تبلیغ:</label>
   <select id="adType">
@@ -49,7 +57,23 @@ button:hover { background:#219150; }
 </div>
 
 <script>
-// --- توابع مدیریت تبلیغات (ارتباط با سرور) ---
+function login() {
+  const key = document.getElementById("adminKey").value.trim();
+  if (!key) return alert("⚠️ کلید را وارد کنید");
+
+  // ذخیره کلید در localStorage
+  localStorage.setItem("ADMIN_KEY", key);
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("adminPanel").classList.remove("hidden");
+  loadAds(); // بعد از ورود، تبلیغات را بارگذاری کن
+}
+
+// گرفتن کلید از localStorage
+function getAdminKey() {
+  return localStorage.getItem("ADMIN_KEY") || "";
+}
+
+// --- افزودن یا بروزرسانی تبلیغ ---
 async function saveAd() {
   const type = document.getElementById("adType").value;
   const content = document.getElementById("adContent").value.trim();
@@ -57,121 +81,106 @@ async function saveAd() {
   const id = document.getElementById("adId").value.trim();
 
   if (!content || !link || !id) {
-    alert("⚠️ لطفا همه فیلدها (نوع، محتوا/src، لینک، ID) را پر کنید!");
+    alert("⚠️ لطفا همه فیلدها را پر کنید!");
     return;
   }
 
   const adData = { id, type, link };
-  if (type === "text") {
-    adData.text = content;
-  } else {
-    adData.src = content;
-  }
+  if (type === "text") adData.text = content;
+  else adData.src = content;
 
   try {
-    const response = await fetch('/api/ads', {
-      method: 'POST',
+    const response = await fetch("/api/ads", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json'
+        "Content-Type": "application/json",
+        "x-admin-key": getAdminKey()
       },
       body: JSON.stringify(adData)
     });
-
     const result = await response.json();
     if (response.ok) {
       alert(`✅ ${result.message}`);
-      // پاک کردن فیلدها
-      document.getElementById("adContent").value = "";
-      document.getElementById("adLink").value = "";
-      document.getElementById("adId").value = "";
-      loadAds(); // بارگذاری مجدد لیست
+      loadAds();
     } else {
-      alert(`❌ خطا: ${result.message || 'مشکلی پیش آمد.'}`);
+      alert(`❌ خطا: ${result.message}`);
     }
-  } catch (error) {
-    console.error("خطا در افزودن/به‌روزرسانی تبلیغ:", error);
-    alert("❌ خطای شبکه یا سرور در افزودن/به‌روزرسانی تبلیغ.");
+  } catch (err) {
+    alert("❌ خطا در ارتباط با سرور");
   }
 }
 
+// --- حذف تبلیغ ---
 async function deleteAd(idToDelete) {
-  if (!confirm(`آیا مطمئنید می‌خواهید تبلیغ با ID: ${idToDelete} را حذف کنید؟`)) {
-    return;
-  }
-
+  if (!confirm(`حذف تبلیغ ${idToDelete}؟`)) return;
   try {
     const response = await fetch(`/api/ads/${idToDelete}`, {
-      method: 'DELETE'
+      method: "DELETE",
+      headers: { "x-admin-key": getAdminKey() }
     });
-
     const result = await response.json();
     if (response.ok) {
-      alert(`✅ ${result.message}`);
-      loadAds(); // بارگذاری مجدد لیست
+      alert("✅ تبلیغ حذف شد");
+      loadAds();
     } else {
-      alert(`❌ خطا: ${result.message || 'مشکلی پیش آمد.'}`);
+      alert(`❌ ${result.message}`);
     }
-  } catch (error) {
-    console.error("خطا در حذف تبلیغ:", error);
-    alert("❌ خطای شبکه یا سرور در حذف تبلیغ.");
+  } catch (err) {
+    alert("❌ خطا در حذف تبلیغ");
   }
 }
 
-// بارگذاری لیست تبلیغات و آمارهایشان از سرور
+// --- بارگذاری تبلیغات ---
 async function loadAds() {
   const adsContainer = document.getElementById("adsContainer");
-  adsContainer.innerHTML = "";
+  adsContainer.innerHTML = "<p>⏳ در حال بارگذاری...</p>";
 
   try {
-    const response = await fetch('/api/ads'); // این endpoint حالا هم تبلیغات و هم آمار را برمی‌گرداند
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const adsWithStats = await response.json();
-    console.log("تبلیغات با آمار از سرور دریافت شد:", adsWithStats);
+    const response = await fetch("/api/ads", {
+      headers: { "x-admin-key": getAdminKey() }
+    });
+    const ads = await response.json();
 
-    if (adsWithStats.length === 0) {
-      adsContainer.innerHTML = "<p>هیچ تبلیغی ثبت نشده است.</p>";
+    if (ads.length === 0) {
+      adsContainer.innerHTML = "<p>📭 هیچ تبلیغی وجود ندارد</p>";
       return;
     }
 
-    adsWithStats.forEach(ad => {
-      let adText = "";
-      if (ad.type === "text") {
-        adText = `📝 متن: ${ad.text}`;
-      } else if (ad.type === "image") {
-        adText = `🖼 عکس: ${ad.src}`;
-      } else if (ad.type === "video") {
-        adText = `🎬 ویدیو: ${ad.src}`;
-      }
-
-      // آمار مستقیم از شیء ad خوانده می‌شود (چون سرور آن را اضافه کرده است)
-      const views = ad.views || 0;
-      const clicks = ad.clicks || 0;
-
+    adsContainer.innerHTML = "";
+    ads.forEach(ad => {
+      let preview = "";
+      if (ad.type === "image") preview = `<div class="ad-preview"><img src="${ad.src}" alt="ad"></div>`;
+      if (ad.type === "video") preview = `<div class="ad-preview"><video src="${ad.src}" controls></video></div>`;
       adsContainer.innerHTML += `
         <div class="ad-item">
           <div class="ad-info">
             <strong>شناسه: ${ad.id}</strong><br>
-            ${adText}<br>
+            ${ad.type === "text" ? `📝 متن: ${ad.text}` : ""}
+            ${preview}
+            <br>
             🔗 لینک: <a href="${ad.link}" target="_blank">${ad.link}</a>
             <div class="ad-stats">
-              <span>👁 بازدید: ${views}</span>
-              <span>⚡️ کلیک: ${clicks}</span>
+              <span>👁 بازدید: ${ad.views}</span>
+              <span>⚡️ کلیک: ${ad.clicks}</span>
             </div>
           </div>
           <button class="delete-btn" onclick="deleteAd('${ad.id}')">❌ حذف</button>
         </div>
       `;
     });
-  } catch (error) {
-    console.error("خطا در بارگذاری تبلیغات از سرور:", error);
-    adsContainer.innerHTML = "<p>❌ خطایی در بارگذاری تبلیغات رخ داد.</p>";
+  } catch (err) {
+    adsContainer.innerHTML = "<p>❌ خطا در دریافت تبلیغات</p>";
   }
 }
 
-// بارگذاری اولیه لیست تبلیغات و آمارها هنگام بارگذاری صفحه
-window.onload = loadAds; 
+// اگر کلید از قبل ذخیره شده بود → مستقیم وارد پنل شو
+window.onload = function() {
+  if (getAdminKey()) {
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
+    loadAds();
+  }
+};
 </script>
 </body>
 </html>

@@ -262,7 +262,7 @@ async function registerClick(adId) {
 // گرفتن تبلیغات از سرور
 async function fetchAds() {
   try {
-    const res = await fetch("${API_BASE}/api/ads");
+    const res = await fetch(`${API_BASE}/api/ads`);
     return await res.json();
   } catch (err) {
     console.error("❌ خطا در دریافت تبلیغات:", err);

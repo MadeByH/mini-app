@@ -3,138 +3,156 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const ADS_FILE = path.join(__dirname, 'ads.json');
+const PORT = 3000;
 
-// Middleware برای پردازش JSON و URL-encoded data
+// مسیر فایل‌های داده
+const ADS_FILE = path.join(__dirname, 'ads.json'); // فایل تبلیغات شما
+const STATS_FILE = path.join(__dirname, 'ad_stats.json'); // فایل آمار
+
+// --- توابع کمکی برای خواندن/نوشتن فایل‌ها ---
+
+// خواندن یا ایجاد فایل تبلیغات
+function loadAds() {
+    try {
+        if (!fs.existsSync(ADS_FILE)) {
+            fs.writeFileSync(ADS_FILE, JSON.stringify([])); // اگر وجود نداشت، یک آرایه خالی ایجاد کن
+        }
+        const data = fs.readFileSync(ADS_FILE, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('خطا در خواندن فایل تبلیغات:', error);
+        return [];
+    }
+}
+
+// ذخیره کردن تبلیغات
+function saveAds(ads) {
+    try {
+        fs.writeFileSync(ADS_FILE, JSON.stringify(ads, null, 2), 'utf-8');
+    } catch (error) {
+        console.error('خطا در ذخیره فایل تبلیغات:', error);
+    }
+}
+
+// خواندن یا ایجاد فایل آمار
+function loadStats() {
+    try {
+        if (!fs.existsSync(STATS_FILE)) {
+            fs.writeFileSync(STATS_FILE, JSON.stringify({})); // اگر وجود نداشت، یک آبجکت خالی ایجاد کن
+        }
+        const data = fs.readFileSync(STATS_FILE, 'utf-8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('خطا در خواندن فایل آمار:', error);
+        return {};
+    }
+}
+
+// ذخیره کردن آمار
+function saveStats(stats) {
+    try {
+        fs.writeFileSync(STATS_FILE, JSON.stringify(stats, null, 2), 'utf-8');
+    } catch (error) {
+        console.error('خطا در ذخیره فایل آمار:', error);
+    }
+}
+
+let adStats = loadStats(); // بارگذاری آمار هنگام شروع سرور
+
+// تابع کمکی برای اطمینان از وجود adId در آمار
+function ensureAdStats(adId) {
+    if (!adStats[adId]) {
+        adStats[adId] = { views: 0, clicks: 0 };
+    }
+}
+
+// --- Middleware ---
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname))); // برای سرو کردن فایل‌های استاتیک
 
-// سرو کردن فایل‌های استاتیک از پوشه فعلی (جایی که server.js قرار دارد)
-// این باعث می‌شود index.html, admin.html, style.css, script.js مستقیماً قابل دسترسی باشند.
-app.use(express.static(__dirname)); 
+// --- API Routes ---
 
-// تابع برای خواندن تبلیغات از ads.json
-const readAds = () => {
-  if (!fs.existsSync(ADS_FILE)) {
-    return [];
-  }
-  const data = fs.readFileSync(ADS_FILE, 'utf8');
-  return JSON.parse(data);
-};
-
-// تابع برای ذخیره تبلیغات در ads.json
-const saveAds = (ads) => {
-  fs.writeFileSync(ADS_FILE, JSON.stringify(ads, null, 2), 'utf8');
-};
-
-// --------------- API Endpoints ---------------
-
-// GET /api/ads: لیست تمام تبلیغات را برمی‌گرداند
+// 1. دریافت لیست کامل تبلیغات (همراه با آمار)
 app.get('/api/ads', (req, res) => {
-  const ads = readAds();
-  // بهتر است اطلاعات حساس مثل 'viewers' را به کلاینت عادی نفرستیم
-  const publicAds = ads.map(ad => ({
-    id: ad.id,
-    type: ad.type,
-    text: ad.text,
-    src: ad.src,
-    link: ad.link,
-    // برای نمایش در index.html نیازی به uniqueViews و clicks نیست، مگر اینکه بخواهید نمایش دهید
-  }));
-  res.json(publicAds);
+    const ads = loadAds(); // خواندن تبلیغات از ads.json
+    const adsWithStats = ads.map(ad => {
+        ensureAdStats(ad.id); // اطمینان از وجود آمار برای این تبلیغ
+        return {
+            ...ad,
+            views: adStats[ad.id].views,
+            clicks: adStats[ad.id].clicks
+        };
+    });
+    res.json(adsWithStats);
 });
 
-// POST /api/view/:id: ثبت بازدید واقعی (Unique View)
-app.post("/api/view/:id", (req, res) => {
-  let ads = readAds();
-  const adId = parseInt(req.params.id);
-  const ad = ads.find(a => a.id === adId);
+// 2. افزودن یا به‌روزرسانی یک تبلیغ (توسط پنل ادمین)
+app.post('/api/ads', (req, res) => {
+    const newAd = req.body; // تبلیغ جدید از بدنه درخواست
+    let ads = loadAds();
 
-  if (!ad) return res.status(404).json({ success: false, message: "تبلیغ یافت نشد" });
+    const existingAdIndex = ads.findIndex(ad => ad.id === newAd.id);
 
-  // گرفتن IP کاربر
-  // x-forwarded-for برای پروکسی‌ها و لودبالانسرها استفاده می‌شود.
-  // req.connection.remoteAddress برای اتصال مستقیم.
-  const userIp =
-    req.headers["x-forwarded-for"]?.split(",")[0] || req.connection.remoteAddress;
-
-  // اگر آرایه viewers وجود ندارد، ایجادش کن
-  if (!ad.viewers) ad.viewers = [];
-
-  // اگر IP کاربر در لیست viewers نیست، آن را اضافه کن و uniqueViews را افزایش بده
-  if (!ad.viewers.includes(userIp)) {
-    ad.viewers.push(userIp);
-    ad.uniqueViews = (ad.uniqueViews || 0) + 1; // اگر قبلاً uniqueViews نداشته، 0 در نظر بگیر
-  }
-
-  saveAds(ads);
-  res.json({ success: true, uniqueViews: ad.uniqueViews });
+    if (existingAdIndex > -1) {
+        // به‌روزرسانی تبلیغ موجود
+        ads[existingAdIndex] = newAd;
+        res.json({ message: 'تبلیغ به‌روز شد', ad: newAd });
+    } else {
+        // افزودن تبلیغ جدید
+        ads.push(newAd);
+        res.status(201).json({ message: 'تبلیغ اضافه شد', ad: newAd });
+    }
+    saveAds(ads); // ذخیره تغییرات در ads.json
 });
 
-// POST /api/click/:id: ثبت کلیک
-app.post("/api/click/:id", (req, res) => {
-  let ads = readAds();
-  const adId = parseInt(req.params.id);
-  const ad = ads.find(a => a.id === adId);
+// 3. حذف یک تبلیغ (توسط پنل ادمین)
+app.delete('/api/ads/:id', (req, res) => {
+    const adIdToDelete = req.params.id;
+    let ads = loadAds();
+    const initialLength = ads.length;
+    ads = ads.filter(ad => ad.id !== adIdToDelete);
 
-  if (!ad) return res.status(404).json({ success: false, message: "تبلیغ یافت نشد" });
-
-  // افزایش تعداد کلیک‌ها
-  ad.clicks = (ad.clicks || 0) + 1; // اگر قبلاً clicks نداشته، 0 در نظر بگیر
-
-  saveAds(ads);
-  res.json({ success: true, clicks: ad.clicks });
+    if (ads.length < initialLength) {
+        saveAds(ads); // ذخیره تغییرات در ads.json
+        // (اختیاری) می‌توانید آمار مربوط به این تبلیغ را هم از adStats حذف کنید
+        delete adStats[adIdToDelete];
+        saveStats(adStats); // ذخیره آمار به‌روز شده
+        res.json({ message: 'تبلیغ حذف شد' });
+    } else {
+        res.status(404).json({ message: 'تبلیغ با این شناسه یافت نشد.' });
+    }
 });
 
-// POST /api/add: یک تبلیغ جدید اضافه می‌کند
-app.post('/api/add', (req, res) => {
-  const { type, text, src, link } = req.body;
-  if (!type || !link) { // حداقل نوع و لینک باید وجود داشته باشد
-    return res.status(400).json({ success: false, message: "نوع و لینک تبلیغ الزامی است." });
-  }
 
-  let ads = readAds();
-  const newId = ads.length > 0 ? Math.max(...ads.map(ad => ad.id)) + 1 : 1;
-
-  const newAd = {
-    id: newId,
-    type,
-    text: text || null, // متن برای تبلیغات متنی
-    src: src || null,   // منبع برای تبلیغات تصویری/ویدیویی
-    link,
-    uniqueViews: 0,
-    clicks: 0,
-    viewers: [] // آرایه برای نگهداری IP بازدیدکنندگان واقعی
-  };
-
-  ads.push(newAd);
-  saveAds(ads);
-  res.status(201).json({ success: true, ad: newAd });
+// 4. ثبت بازدید (از صفحه نمایش تبلیغات)
+app.post('/api/view/:id', (req, res) => {
+    const adId = req.params.id;
+    ensureAdStats(adId);
+    adStats[adId].views++;
+    saveStats(adStats); // ذخیره تغییرات
+    res.json({ success: true, views: adStats[adId].views });
 });
 
-// GET /api/admin/ads: لیست کامل تبلیغات با آمار (برای پنل ادمین)
-app.get("/api/admin/ads", (req, res) => {
-  const ads = readAds();
-  // برای پنل ادمین، نیازی به ارسال آرایه viewers نیست، اما سایر اطلاعات را می‌فرستیم
-  const adminAds = ads.map(ad => ({
-    id: ad.id,
-    type: ad.type,
-    text: ad.text,
-    src: ad.src,
-    link: ad.link,
-    uniqueViews: ad.uniqueViews || 0,
-    clicks: ad.clicks || 0,
-  }));
-  res.json(adminAds);
+// 5. ثبت کلیک (از صفحه نمایش تبلیغات)
+app.post('/api/click/:id', (req, res) => {
+    const adId = req.params.id;
+    ensureAdStats(adId);
+    adStats[adId].clicks++;
+    saveStats(adStats); // ذخیره تغییرات
+    res.json({ success: true, clicks: adStats[adId].clicks });
 });
 
-// شروع سرور
+// 6. Endpoint جدید برای پنل ادمین (فقط برای دریافت همه آمار)
+app.get('/api/ads/stats', (req, res) => {
+    res.json(adStats);
+});
+
+// --- Route برای سرو کردن index.html ---
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// --- شروع سرور ---
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-  // مطمئن می‌شویم که ads.json در صورت عدم وجود، ایجاد شود.
-  if (!fs.existsSync(ADS_FILE)) {
-    saveAds([]);
-    console.log('ads.json created.');
-  }
+    console.log(`سرور در حال اجرا روی http://localhost:${PORT}`);
 });

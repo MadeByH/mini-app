@@ -35,13 +35,13 @@ let adStats = loadStats();
 // اطمینان از وجود آمار برای هر تبلیغ
 function ensureAdStats(adId) {
   if (!adStats[adId]) {
-    adStats[adId] = { views: 0, clicks: 0, viewers: [] };
+    adStats[adId] = { views: 0, clicks: 0, viewers: [] }; // viewers = IPهایی که دیدن
   }
 }
 
 // --- Middleware ---
 app.use(express.json());
-app.use(express.static(__dirname));
+app.use(express.static(__dirname)); // همه فایل‌ها کنار هم
 
 // --- API Routes ---
 
@@ -69,6 +69,11 @@ app.post("/api/ads", (req, res) => {
   let ads = loadAds();
   const { id, type, text, src, link } = req.body;
 
+  // بررسی اینکه ID تکراری نباشه
+  if (ads.find((a) => a.id === id)) {
+    return res.status(400).json({ message: "❌ این ID قبلاً استفاده شده است." });
+  }
+
   const newAd = { id, type, text, src, link };
   ads.push(newAd);
   saveAds(ads);
@@ -76,7 +81,7 @@ app.post("/api/ads", (req, res) => {
   ensureAdStats(id);
   saveStats(adStats);
 
-  res.status(201).json({ message: "تبلیغ اضافه شد", ad: newAd });
+  res.status(201).json({ message: "✅ تبلیغ اضافه شد", ad: newAd });
 });
 
 // 📌 حذف تبلیغ (فقط ادمین)
@@ -96,9 +101,9 @@ app.delete("/api/ads/:id", (req, res) => {
     saveAds(ads);
     delete adStats[adId];
     saveStats(adStats);
-    res.json({ message: "تبلیغ حذف شد" });
+    res.json({ message: "✅ تبلیغ حذف شد" });
   } else {
-    res.status(404).json({ message: "تبلیغ پیدا نشد" });
+    res.status(404).json({ message: "❌ تبلیغ پیدا نشد" });
   }
 });
 

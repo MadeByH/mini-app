@@ -283,26 +283,27 @@ async function showRandomAd() {
   const viewData = await registerView(randomAd.id);
 
   if (randomAd.type === "text") {
-    html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
-              ${randomAd.text}
-            </a>`;
-  } else if (randomAd.type === "image") {
-    html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
-              <img src="${randomAd.src}" alt="تبلیغ">
-            </a>`;
-  } else if (randomAd.type === "video") {
-    html = `<video controls style="max-width:100%; border-radius:10px;">
-              <source src="${randomAd.src}" type="video/mp4">
-              مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-            </video>
-            <p><a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
-              🔗 مشاهده بیشتر
-            </a></p>`;
-  }
+  html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+            ${randomAd.text}
+          </a>`;
+} else if (randomAd.type === "image") {
+  html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+            <img src="${randomAd.src}" alt="تبلیغ">
+          </a>`;
+} else if (randomAd.type === "video") {
+  html = `<video controls style="max-width:100%; border-radius:10px;">
+            <source src="${randomAd.src}" type="video/mp4">
+            مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+          </video>
+          <p><a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+            🔗 مشاهده بیشتر
+          </a></p>`;
+}
 
-  // نمایش تعداد بازدیدها (اختیاری)
-  const viewCountHtml = viewData.success ? `<p style="font-size:0.8em;color:gray;">👁 بازدید یکتا: ${viewData.uniqueViews}</p>` : '';
-  adBox.innerHTML = html + viewCountHtml;
+const viewCountHtml = viewData.success
+  ? `<p style="font-size:0.8em;color:gray;">👁 بازدید یکتا: ${viewData.views}</p>`
+  : '';
+adBox.innerHTML = html + viewCountHtml;
 }
 
 // نمایش تبلیغ اول

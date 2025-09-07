@@ -110,6 +110,15 @@
       border-radius: 10px;
       margin: 10px 0;
     }
+    /* استایل برای لینک داخل تبلیغ متنی */
+    .ad-box a {
+        text-decoration: none;
+        color: var(--primary-color);
+        font-weight: bold;
+    }
+    .ad-box a:hover {
+        text-decoration: underline;
+    }
 
     /* پنل تنظیمات */
     .settings-panel {
@@ -202,13 +211,58 @@
 </div>
 
 <script>
+// تابع برای ثبت بازدید واقعی (Unique View)
+async function registerView(adId) {
+    try {
+        const response = await fetch(`/api/view/${adId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log(`✅ بازدید واقعی برای تبلیغ ${adId} ثبت شد. مجموع بازدید یکتا: ${data.uniqueViews}`);
+        } else {
+            // اگر قبلا IP ثبت شده باشد، ممکن است این خطا رخ دهد که طبیعی است.
+            console.warn(`⚠️ خطا در ثبت بازدید برای تبلیغ ${adId}: ${data.message}`);
+        }
+        return data; // برای نمایش تعداد بازدید
+    } catch (error) {
+        console.error('❌ خطا در ارسال درخواست ثبت بازدید:', error);
+        return { success: false, message: 'خطای شبکه یا سرور' };
+    }
+}
+
+// تابع جدید برای ثبت کلیک
+async function registerClick(adId) {
+    try {
+        const response = await fetch(`/api/click/${adId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        const data = await response.json();
+        if (data.success) {
+            console.log(`⚡️ کلیک برای تبلیغ ${adId} ثبت شد. مجموع کلیک‌ها: ${data.clicks}`);
+        } else {
+            console.error(`❌ خطا در ثبت کلیک برای تبلیغ ${adId}: ${data.message}`);
+        }
+        return data; // برای نمایش تعداد کلیک
+    } catch (error) {
+        console.error('❌ خطا در ارسال درخواست ثبت کلیک:', error);
+        return { success: false, message: 'خطای شبکه یا سرور' };
+    }
+}
+
 // گرفتن تبلیغات از سرور
 async function fetchAds() {
   try {
     const res = await fetch("/api/ads");
     return await res.json();
   } catch (err) {
-    console.error("خطا در دریافت تبلیغات:", err);
+    console.error("❌ خطا در دریافت تبلیغات:", err);
     return [];
   }
 }
@@ -218,36 +272,37 @@ async function showRandomAd() {
   const adBox = document.getElementById("adBox");
 
   if (ads.length === 0) {
-    adBox.innerHTML = "<p>📭 تبلیغی وجود ندارد</p>";
+    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";
     return;
   }
 
   const randomAd = ads[Math.floor(Math.random() * ads.length)];
   let html = "";
+  
+  // ثبت بازدید واقعی بلافاصله پس از انتخاب تبلیغ برای نمایش
+  const viewData = await registerView(randomAd.id);
 
   if (randomAd.type === "text") {
-    html = `<a href="${randomAd.link}" target="_blank">${randomAd.text}</a>`;
+    html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
+              ${randomAd.text}
+            </a>`;
   } else if (randomAd.type === "image") {
-    html = `<a href="${randomAd.link}" target="_blank">
-              <img src="${randomAd.src}" alt="ad">
+    html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
+              <img src="${randomAd.src}" alt="تبلیغ">
             </a>`;
   } else if (randomAd.type === "video") {
-    html = `<video controls>
+    html = `<video controls style="max-width:100%; border-radius:10px;">
               <source src="${randomAd.src}" type="video/mp4">
               مرورگر شما از ویدیو پشتیبانی نمی‌کند.
             </video>
-            <p><a href="${randomAd.link}" target="_blank">🔗 مشاهده بیشتر</a></p>`;
+            <p><a href="${randomAd.link}" target="_blank" onclick="registerClick(${randomAd.id});">
+              🔗 مشاهده بیشتر
+            </a></p>`;
   }
 
-  // ثبت بازدید در سرور
-  fetch(`/api/view/${randomAd.id}`, { method: "POST" })
-    .then(res => res.json())
-    .then(data => {
-      adBox.innerHTML = html + `<p style="font-size:0.8em;color:gray;">👁 بازدید: ${data.views}</p>`;
-    })
-    .catch(() => {
-      adBox.innerHTML = html;
-    });
+  // نمایش تعداد بازدیدها (اختیاری)
+  const viewCountHtml = viewData.success ? `<p style="font-size:0.8em;color:gray;">👁 بازدید یکتا: ${viewData.uniqueViews}</p>` : '';
+  adBox.innerHTML = html + viewCountHtml;
 }
 
 // نمایش تبلیغ اول

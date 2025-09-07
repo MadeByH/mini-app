@@ -7,6 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 // 🔑 کلید ادمین (هرچی خواستی بذار)
 const ADMIN_KEY = process.env.ADMIN_KEY || "1387hhh" // مسیر فایل‌های داده
+const API_BASE = "https://mini-app-add-bot.onrender.com";
 const ADS_FILE = path.join(__dirname, "ads.json");
 const STATS_FILE = path.join(__dirname, "ad_stats.json");
 
@@ -44,7 +45,7 @@ app.use(express.static(__dirname)); // همه فایل‌ها کنار هم
 // --- API Routes ---
 
 // 📌 گرفتن لیست تبلیغات
-app.get("/api/ads", (req, res) => {
+app.get("${API_BASE}/api/ads", (req, res) => {
   const ads = loadAds();
   const adsWithStats = ads.map((ad) => {
     ensureAdStats(ad.id);
@@ -58,7 +59,7 @@ app.get("/api/ads", (req, res) => {
 });
 
 // 📌 افزودن تبلیغ (فقط ادمین)
-app.post("/api/ads", (req, res) => {
+app.post("${API_BASE}/api/ads", (req, res) => {
   const adminKey = req.headers["x-admin-key"];
   if (adminKey !== ADMIN_KEY) {
     return res.status(403).json({ message: "دسترسی غیرمجاز" });
@@ -81,7 +82,7 @@ app.post("/api/ads", (req, res) => {
 });
 
 // 📌 حذف تبلیغ (فقط ادمین)
-app.delete("/api/ads/:id", (req, res) => {
+app.delete("${API_BASE}/api/ads/:id", (req, res) => {
   const adminKey = req.headers["x-admin-key"];
   if (adminKey !== ADMIN_KEY) {
     return res.status(403).json({ message: "دسترسی غیرمجاز" });
@@ -104,7 +105,7 @@ app.delete("/api/ads/:id", (req, res) => {
 });
 
 // 📌 ثبت بازدید یونیک
-app.post("/api/view/:id", (req, res) => {
+app.post("${API_BASE}/api/view/:id", (req, res) => {
   const adId = req.params.id;
   const userIp = req.ip; // آی‌پی کاربر
 
@@ -120,7 +121,7 @@ app.post("/api/view/:id", (req, res) => {
 });
 
 // 📌 ثبت کلیک
-app.post("/api/click/:id", (req, res) => {
+app.post("${API_BASE}/api/click/:id", (req, res) => {
   const adId = req.params.id;
   ensureAdStats(adId);
   adStats[adId].clicks++;
@@ -129,7 +130,7 @@ app.post("/api/click/:id", (req, res) => {
 });
 
 // 📌 گرفتن آمار کامل (ادمین)
-app.get("/api/ads/stats", (req, res) => {
+app.get("${API_BASE}/api/ads/stats", (req, res) => {
   const adminKey = req.headers["x-admin-key"];
   if (adminKey !== ADMIN_KEY) {
     return res.status(403).json({ message: "دسترسی غیرمجاز" });

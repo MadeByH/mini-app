@@ -12,9 +12,13 @@ input, select { width:100%; padding:10px; margin-top:5px; border:1px solid #ccc;
 button { margin-top:20px; padding:12px; background:#27ae60; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:1em; }
 button:hover { background:#219150; }
 .ad-list { margin-top:30px; }
-.ad-item { padding:12px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; }
+.ad-item { padding:12px; border:1px solid #ccc; border-radius:8px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; }
+.ad-info { flex-grow: 1; margin-left: 15px; }
+.ad-stats { font-size: 0.9em; color: #555; margin-top: 8px; }
+.ad-stats span { margin-left: 15px; }
 .delete-btn { background:#e74c3c; padding:6px 12px; border:none; border-radius:6px; color:#fff; cursor:pointer; }
 .delete-btn:hover { background:#c0392b; }
+.ad-item div:first-child { display: flex; flex-direction: column; justify-content: center; flex-grow: 1; }
 </style>
 </head>
 <body>
@@ -27,13 +31,16 @@ button:hover { background:#219150; }
     <option value="video">ویدیو</option>
   </select>
 
-  <label>متن یا آدرس فایل:</label>
-  <input type="text" id="adContent" placeholder="متن تبلیغ یا لینک فایل"/>
+  <label>متن یا آدرس فایل (src):</label>
+  <input type="text" id="adContent" placeholder="متن تبلیغ یا لینک عکس/ویدیو"/>
 
   <label>لینک مقصد:</label>
   <input type="text" id="adLink" placeholder="https://example.com"/>
+  
+  <label>شناسه منحصر به فرد (ID):</label>
+  <input type="text" id="adId" placeholder="مثال: banner_top, promo_fall"/>
 
-  <button onclick="saveAd()">➕ افزودن تبلیغ</button>
+  <button onclick="saveAd()">➕ افزودن/به‌روزرسانی تبلیغ</button>
 
   <div class="ad-list" id="adList">
     <h2>📋 لیست تبلیغات</h2>
@@ -42,72 +49,129 @@ button:hover { background:#219150; }
 </div>
 
 <script>
-function saveAd() {
+// --- توابع مدیریت تبلیغات (ارتباط با سرور) ---
+async function saveAd() {
   const type = document.getElementById("adType").value;
   const content = document.getElementById("adContent").value.trim();
   const link = document.getElementById("adLink").value.trim();
+  const id = document.getElementById("adId").value.trim();
 
-  if (!content || !link) {
-    alert("⚠️ لطفا همه فیلدها را پر کنید!");
+  if (!content || !link || !id) {
+    alert("⚠️ لطفا همه فیلدها (نوع، محتوا/src، لینک، ID) را پر کنید!");
     return;
   }
 
-  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
+  const adData = { id, type, link };
   if (type === "text") {
-    ads.push({ type: "text", text: content, link });
-  } else if (type === "image") {
-    ads.push({ type: "image", src: content, link });
-  } else if (type === "video") {
-    ads.push({ type: "video", src: content, link });
+    adData.text = content;
+  } else {
+    adData.src = content;
   }
 
-  localStorage.setItem("ads", JSON.stringify(ads));
-  document.getElementById("adContent").value = "";
-  document.getElementById("adLink").value = "";
-  loadAds();
-  alert("✅ تبلیغ ذخیره شد!");
+  try {
+    const response = await fetch('/api/ads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(adData)
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`✅ ${result.message}`);
+      // پاک کردن فیلدها
+      document.getElementById("adContent").value = "";
+      document.getElementById("adLink").value = "";
+      document.getElementById("adId").value = "";
+      loadAds(); // بارگذاری مجدد لیست
+    } else {
+      alert(`❌ خطا: ${result.message || 'مشکلی پیش آمد.'}`);
+    }
+  } catch (error) {
+    console.error("خطا در افزودن/به‌روزرسانی تبلیغ:", error);
+    alert("❌ خطای شبکه یا سرور در افزودن/به‌روزرسانی تبلیغ.");
+  }
 }
 
-function deleteAd(index) {
-  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
-  ads.splice(index, 1);
-  localStorage.setItem("ads", JSON.stringify(ads));
-  loadAds();
+async function deleteAd(idToDelete) {
+  if (!confirm(`آیا مطمئنید می‌خواهید تبلیغ با ID: ${idToDelete} را حذف کنید؟`)) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/api/ads/${idToDelete}`, {
+      method: 'DELETE'
+    });
+
+    const result = await response.json();
+    if (response.ok) {
+      alert(`✅ ${result.message}`);
+      loadAds(); // بارگذاری مجدد لیست
+    } else {
+      alert(`❌ خطا: ${result.message || 'مشکلی پیش آمد.'}`);
+    }
+  } catch (error) {
+    console.error("خطا در حذف تبلیغ:", error);
+    alert("❌ خطای شبکه یا سرور در حذف تبلیغ.");
+  }
 }
 
-function loadAds() {
+// بارگذاری لیست تبلیغات و آمارهایشان از سرور
+async function loadAds() {
   const adsContainer = document.getElementById("adsContainer");
   adsContainer.innerHTML = "";
-  let ads = JSON.parse(localStorage.getItem("ads") || "[]");
 
-  if (ads.length === 0) {
-    adsContainer.innerHTML = "<p>هیچ تبلیغی ثبت نشده است.</p>";
-    return;
-  }
+  try {
+    const response = await fetch('/api/ads'); // این endpoint حالا هم تبلیغات و هم آمار را برمی‌گرداند
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const adsWithStats = await response.json();
+    console.log("تبلیغات با آمار از سرور دریافت شد:", adsWithStats);
 
-  ads.forEach((ad, index) => {
-    let adText = "";
-    if (ad.type === "text") {
-      adText = `📝 متن: ${ad.text}`;
-    } else if (ad.type === "image") {
-      adText = `🖼 عکس: ${ad.src}`;
-    } else if (ad.type === "video") {
-      adText = `🎬 ویدیو: ${ad.src}`;
+    if (adsWithStats.length === 0) {
+      adsContainer.innerHTML = "<p>هیچ تبلیغی ثبت نشده است.</p>";
+      return;
     }
 
-    adsContainer.innerHTML += `
-      <div class="ad-item">
-        <div>
-          ${adText}<br>🔗 لینک: ${ad.link}
+    adsWithStats.forEach(ad => {
+      let adText = "";
+      if (ad.type === "text") {
+        adText = `📝 متن: ${ad.text}`;
+      } else if (ad.type === "image") {
+        adText = `🖼 عکس: ${ad.src}`;
+      } else if (ad.type === "video") {
+        adText = `🎬 ویدیو: ${ad.src}`;
+      }
+
+      // آمار مستقیم از شیء ad خوانده می‌شود (چون سرور آن را اضافه کرده است)
+      const views = ad.views || 0;
+      const clicks = ad.clicks || 0;
+
+      adsContainer.innerHTML += `
+        <div class="ad-item">
+          <div class="ad-info">
+            <strong>شناسه: ${ad.id}</strong><br>
+            ${adText}<br>
+            🔗 لینک: <a href="${ad.link}" target="_blank">${ad.link}</a>
+            <div class="ad-stats">
+              <span>👁 بازدید: ${views}</span>
+              <span>⚡️ کلیک: ${clicks}</span>
+            </div>
+          </div>
+          <button class="delete-btn" onclick="deleteAd('${ad.id}')">❌ حذف</button>
         </div>
-        <button class="delete-btn" onclick="deleteAd(${index})">❌ حذف</button>
-      </div>
-    `;
-  });
+      `;
+    });
+  } catch (error) {
+    console.error("خطا در بارگذاری تبلیغات از سرور:", error);
+    adsContainer.innerHTML = "<p>❌ خطایی در بارگذاری تبلیغات رخ داد.</p>";
+  }
 }
 
-// بارگذاری اولیه لیست تبلیغات
-loadAds();
+// بارگذاری اولیه لیست تبلیغات و آمارها هنگام بارگذاری صفحه
+window.onload = loadAds; 
 </script>
 </body>
 </html>

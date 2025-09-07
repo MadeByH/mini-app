@@ -57,6 +57,8 @@ button:hover { background:#219150; }
 </div>
 
 <script>
+const API_BASE = "https://mini-app-add-bot.onrender.com";
+
 function login() {
   const key = document.getElementById("adminKey").value.trim();
   if (!key) return alert("⚠️ کلید را وارد کنید");
@@ -90,7 +92,7 @@ async function saveAd() {
   else adData.src = content;
 
   try {
-    const response = await fetch("/api/ads", {
+    const response = await fetch("${API_BASE}/api/ads", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +116,7 @@ async function saveAd() {
 async function deleteAd(idToDelete) {
   if (!confirm(`حذف تبلیغ ${idToDelete}؟`)) return;
   try {
-    const response = await fetch(`/api/ads/${idToDelete}`, {
+    const response = await fetch(`${API_BASE}/api/ads/${idToDelete}`, {
       method: "DELETE",
       headers: { "x-admin-key": getAdminKey() }
     });
@@ -136,7 +138,7 @@ async function loadAds() {
   adsContainer.innerHTML = "<p>⏳ در حال بارگذاری...</p>";
 
   try {
-    const response = await fetch("/api/ads", {
+    const response = await fetch("${API_BASE}/api/ads", {
       headers: { "x-admin-key": getAdminKey() }
     });
     const ads = await response.json();

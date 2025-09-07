@@ -211,10 +211,13 @@
 </div>
 
 <script>
+
+const API_BASE = "https://mini-app-add-bot.onrender.com";
+
 // تابع برای ثبت بازدید واقعی (Unique View)
 async function registerView(adId) {
     try {
-        const response = await fetch(`/api/view/${adId}`, {
+        const response = await fetch(`${API_BASE}/api/view/${adId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -237,7 +240,7 @@ async function registerView(adId) {
 // تابع جدید برای ثبت کلیک
 async function registerClick(adId) {
     try {
-        const response = await fetch(`/api/click/${adId}`, {
+        const response = await fetch(`${API_BASE}/api/click/${adId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -259,7 +262,7 @@ async function registerClick(adId) {
 // گرفتن تبلیغات از سرور
 async function fetchAds() {
   try {
-    const res = await fetch("/api/ads");
+    const res = await fetch("${API_BASE}/api/ads");
     return await res.json();
   } catch (err) {
     console.error("❌ خطا در دریافت تبلیغات:", err);

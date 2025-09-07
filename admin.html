@@ -92,7 +92,7 @@ async function saveAd() {
   else adData.src = content;
 
   try {
-    const response = await fetch("${API_BASE}/api/ads", {
+    const response = await fetch(`${API_BASE}/api/ads`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -138,7 +138,7 @@ async function loadAds() {
   adsContainer.innerHTML = "<p>⏳ در حال بارگذاری...</p>";
 
   try {
-    const response = await fetch("${API_BASE}/api/ads", {
+    const response = await fetch(`${API_BASE}/api/ads`, {
       headers: { "x-admin-key": getAdminKey() }
     });
     const ads = await response.json();

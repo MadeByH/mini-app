@@ -6,7 +6,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // 🔑 کلید ادمین (هرچی خواستی بذار)
-const ADMIN_KEY = process.env.ADMIN_KEY || "1387hhh" مسیر فایل‌های داده
+const ADMIN_KEY = process.env.ADMIN_KEY || "1387hhh" // مسیر فایل‌های داده
 const ADS_FILE = path.join(__dirname, "ads.json");
 const STATS_FILE = path.join(__dirname, "ad_stats.json");
 

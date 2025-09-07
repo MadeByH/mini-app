@@ -202,22 +202,29 @@
 </div>
 
 <script>
-// تبلیغات
-let ads = JSON.parse(localStorage.getItem("ads") || "[]");
-
-if (ads.length === 0) {
-  ads = [
-    { type: "text", text: "🚀 خرید سکه با تخفیف ویژه!", link: "coins.html" },
-    { type: "image", src: "sample-ad.png", link: "ads.html" },
-    { type: "video", src: "sample-ad.mp4", link: "guide.html" }
-  ];
+// گرفتن تبلیغات از سرور
+async function fetchAds() {
+  try {
+    const res = await fetch("/api/ads");
+    return await res.json();
+  } catch (err) {
+    console.error("خطا در دریافت تبلیغات:", err);
+    return [];
+  }
 }
 
-function showRandomAd() {
+async function showRandomAd() {
+  const ads = await fetchAds();
   const adBox = document.getElementById("adBox");
-  const randomAd = ads[Math.floor(Math.random() * ads.length)];
 
+  if (ads.length === 0) {
+    adBox.innerHTML = "<p>📭 تبلیغی وجود ندارد</p>";
+    return;
+  }
+
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];
   let html = "";
+
   if (randomAd.type === "text") {
     html = `<a href="${randomAd.link}" target="_blank">${randomAd.text}</a>`;
   } else if (randomAd.type === "image") {
@@ -232,14 +239,21 @@ function showRandomAd() {
             <p><a href="${randomAd.link}" target="_blank">🔗 مشاهده بیشتر</a></p>`;
   }
 
-  let views = parseInt(localStorage.getItem("adViews") || "0");
-  views++;
-  localStorage.setItem("adViews", views);
-
-  adBox.innerHTML = html + `<p style="font-size:0.8em;color:gray;">👁 بازدید: ${views}</p>`;
+  // ثبت بازدید در سرور
+  fetch(`/api/view/${randomAd.id}`, { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+      adBox.innerHTML = html + `<p style="font-size:0.8em;color:gray;">👁 بازدید: ${data.views}</p>`;
+    })
+    .catch(() => {
+      adBox.innerHTML = html;
+    });
 }
 
+// نمایش تبلیغ اول
 showRandomAd();
+
+// تغییر هر ۳۰ ثانیه
 setInterval(showRandomAd, 30000);
 
 // تنظیمات

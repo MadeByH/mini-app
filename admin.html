@@ -44,6 +44,9 @@ button:hover { background:#219150; }
 
   <label>لینک مقصد:</label>
   <input type="text" id="adLink" placeholder="https://example.com"/>
+
+  <label>کپشن (اختیاری):</label>
+  <textarea id="adCaption" placeholder="مثلا: تخفیف ویژه تا جمعه!" rows="3"></textarea>
   
   <label>شناسه منحصر به فرد (ID):</label>
   <input type="text" id="adId" placeholder="مثال: banner_top, promo_fall"/>
@@ -92,6 +95,7 @@ async function saveAd() {
   const type = document.getElementById("adType").value;
   const content = document.getElementById("adContent").value.trim();
   const link = document.getElementById("adLink").value.trim();
+  const caption = document.getElementById("adCaption").value.trim();
   const id = document.getElementById("adId").value.trim();
 
   if (!content || !link || !id) {
@@ -99,7 +103,7 @@ async function saveAd() {
     return;
   }
 
-  const adData = { id, type, link };
+  const adData = { id, type, link, caption };
   if (type === "text") adData.text = content;
   else adData.src = content;
 
@@ -170,6 +174,7 @@ async function loadAds() {
           <div class="ad-info">
             <strong>شناسه: ${ad.id}</strong><br>
             ${ad.type === "text" ? `📝 متن: ${ad.text}` : ""}
+            ${ad.caption ? `<br>💬 کپشن: ${ad.caption}` : ""}
             ${preview}
             <br>
             🔗 لینک: <a href="${ad.link}" target="_blank">${ad.link}</a>

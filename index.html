@@ -260,52 +260,49 @@ async function fetchAds() {
   }
 }
 
-async function showRandomAd() {
-  const ads = await fetchAds();
-  const adBox = document.getElementById("adBox");
-
-  if (ads.length === 0) {
-    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";
-    return;
-  }
-
-  const randomAd = ads[Math.floor(Math.random() * ads.length)];
-  await registerView(randomAd.id);
-
-  let html = "";
-  if (randomAd.type === "text") {
-    html = `
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')"
-         style="color:var(--primary-color);font-weight:bold;display:block;margin:10px 0;">
-        ${randomAd.text}
-      </a>
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
-        🔗 مشاهده تبلیغ
-      </a>`;
-  // ... (داخل تابع showRandomAd)
-  } else if (randomAd.type === "image") {
-    html = `
-      <a href="javascript:void(0);" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-        <img src="${randomAd.src}" alt="تبلیغ" style="cursor:pointer; max-width:100%; border-radius:10px;">
-      </a>
-      <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-        🔗 مشاهده تبلیغ
-      </button>`;
-
-  } else if (randomAd.type === "video") {
-    html = `
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
-        <video controls style="max-width:100%; border-radius:10px;">
-          <source src="${randomAd.src}" type="video/mp4">
-          مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-        </video>
-      </a>
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
-        🔗 مشاهده بیشتر
-      </a>`;
-  }
-
-  adBox.innerHTML = html;
+async function showRandomAd() {  
+  const ads = await fetchAds();  
+  const adBox = document.getElementById("adBox");  
+  
+  if (ads.length === 0) {  
+    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";  
+    return;  
+  }  
+  
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];  
+  await registerView(randomAd.id);  
+  
+  let html = "";  
+  if (randomAd.type === "text") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      ${randomAd.text}  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده تبلیغ  
+    </a>`;  
+} else if (randomAd.type === "image") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      <img src="${randomAd.src}" alt="تبلیغ">  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده تبلیغ  
+    </a>`;  
+} else if (randomAd.type === "video") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      <video controls style="max-width:100%; border-radius:10px;">  
+        <source src="${randomAd.src}" type="video/mp4">  
+        مرورگر شما از ویدیو پشتیبانی نمی‌کند.  
+      </video>  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده بیشتر  
+    </a>`;  
+    }  
+  
+  adBox.innerHTML = html;  
     }
 
 // نمایش تبلیغ اول

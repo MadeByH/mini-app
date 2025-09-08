@@ -59,18 +59,30 @@ button:hover { background:#219150; }
 <script>
 const API_BASE = "https://mini-app-add-bot.onrender.com";
 
-function login() {
+async function login() {
   const key = document.getElementById("adminKey").value.trim();
   if (!key) return alert("⚠️ کلید را وارد کنید");
 
-  // ذخیره کلید در localStorage
-  localStorage.setItem("ADMIN_KEY", key);
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("adminPanel").classList.remove("hidden");
-  loadAds(); // بعد از ورود، تبلیغات را بارگذاری کن
+  try {
+    // تست کلید با درخواست آمار
+    const response = await fetch(`${API_BASE}/api/ads/stats`, {
+      headers: { "x-admin-key": key }
+    });
+
+    if (response.ok) {
+      // ذخیره کلید در localStorage
+      localStorage.setItem("ADMIN_KEY", key);
+      document.getElementById("loginBox").classList.add("hidden");
+      document.getElementById("adminPanel").classList.remove("hidden");
+      loadAds();
+    } else {
+      alert("❌ کلید اشتباه است!");
+    }
+  } catch (err) {
+    alert("❌ خطا در ارتباط با سرور");
+  }
 }
 
-// گرفتن کلید از localStorage
 function getAdminKey() {
   return localStorage.getItem("ADMIN_KEY") || "";
 }
@@ -176,13 +188,26 @@ async function loadAds() {
 }
 
 // اگر کلید از قبل ذخیره شده بود → مستقیم وارد پنل شو
-window.onload = function() {
-  if (getAdminKey()) {
-    document.getElementById("loginBox").classList.add("hidden");
-    document.getElementById("adminPanel").classList.remove("hidden");
-    loadAds();
+window.onload = async function() {
+  const savedKey = getAdminKey();
+  if (savedKey) {
+    try {
+      const response = await fetch(`${API_BASE}/api/ads/stats`, {
+        headers: { "x-admin-key": savedKey }
+      });
+      if (response.ok) {
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
+        loadAds();
+      } else {
+        localStorage.removeItem("ADMIN_KEY");
+      }
+    } catch (err) {
+      console.error("❌ خطا در بررسی کلید ذخیره شده", err);
+    }
   }
 };
+
 </script>
 </body>
 </html>

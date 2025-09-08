@@ -107,16 +107,20 @@ app.delete("/api/ads/:id", (req, res) => {
   }
 });
 
-// 📌 ثبت بازدید یونیک
+// 📌 ثبت بازدید یونیک با viewerId
 app.post("/api/view/:id", (req, res) => {
   const adId = req.params.id;
-  const userIp = req.ip;
+  const { viewerId } = req.body;  // شناسه کاربر از کلاینت
+
+  if (!viewerId) {
+    return res.status(400).json({ success: false, message: "viewerId لازم است" });
+  }
 
   ensureAdStats(adId);
 
-  if (!adStats[adId].viewers.includes(userIp)) {
+  if (!adStats[adId].viewers.includes(viewerId)) {
     adStats[adId].views++;
-    adStats[adId].viewers.push(userIp);
+    adStats[adId].viewers.push(viewerId);
     saveStats(adStats);
   }
 

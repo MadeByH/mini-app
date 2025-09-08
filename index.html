@@ -282,14 +282,16 @@ async function showRandomAd() {
       <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
         🔗 مشاهده تبلیغ
       </a>`;
+  // ... (داخل تابع showRandomAd)
   } else if (randomAd.type === "image") {
     html = `
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+      <a href="javascript:void(0);" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
         <img src="${randomAd.src}" alt="تبلیغ" style="cursor:pointer; max-width:100%; border-radius:10px;">
       </a>
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
+      <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
         🔗 مشاهده تبلیغ
-      </a>`;
+      </button>`;
+
   } else if (randomAd.type === "video") {
     html = `
       <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">

@@ -224,15 +224,29 @@
 <script>
 const API_BASE = "https://mini-app-add-bot.onrender.com";
 
+// ساختن شناسه کاربر (یکبار)
+function getViewerId() {
+  let id = localStorage.getItem("viewerId");
+  if (!id) {
+    id = "v_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("viewerId", id);
+  }
+  return id;
+}
+
 // ثبت بازدید
 async function registerView(adId) {
   try {
-    const res = await fetch(`${API_BASE}/api/view/${adId}`, { method: "POST" });
+    const res = await fetch(`${API_BASE}/api/view/${adId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ viewerId: getViewerId() })
+    });
     return await res.json();
   } catch {
     return { success: false };
   }
-}
+    }
 
 // ثبت کلیک
 async function registerClick(adId) {

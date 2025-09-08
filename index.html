@@ -104,20 +104,31 @@
       background: #f9f9f9;
       text-align: center;
       color: #333;
+      margin-bottom: 20px;
     }
     .ad-box img, .ad-box video {
       max-width: 100%;
       border-radius: 10px;
       margin: 10px 0;
     }
-    /* استایل برای لینک داخل تبلیغ متنی */
-    .ad-box a {
-        text-decoration: none;
-        color: var(--primary-color);
-        font-weight: bold;
-    }
-    .ad-box a:hover {
-        text-decoration: underline;
+    /* دکمه تبلیغاتی */
+    .ad-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 18px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff9f1c, #ff4040);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
+    .ad-btn:hover {
+    filter: brightness(1.15);
+    transform: scale(1.07);
     }
 
     /* پنل تنظیمات */
@@ -211,61 +222,40 @@
 </div>
 
 <script>
-
 const API_BASE = "https://mini-app-add-bot.onrender.com";
 
-// تابع برای ثبت بازدید واقعی (Unique View)
+// ثبت بازدید
 async function registerView(adId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/view/${adId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const data = await response.json();
-        if (data.success) {
-            console.log(`✅ بازدید واقعی برای تبلیغ ${adId} ثبت شد. مجموع بازدید یکتا: ${data.uniqueViews}`);
-        } else {
-            // اگر قبلا IP ثبت شده باشد، ممکن است این خطا رخ دهد که طبیعی است.
-            console.warn(`⚠️ خطا در ثبت بازدید برای تبلیغ ${adId}: ${data.message}`);
-        }
-        return data; // برای نمایش تعداد بازدید
-    } catch (error) {
-        console.error('❌ خطا در ارسال درخواست ثبت بازدید:', error);
-        return { success: false, message: 'خطای شبکه یا سرور' };
-    }
+  try {
+    const res = await fetch(`${API_BASE}/api/view/${adId}`, { method: "POST" });
+    return await res.json();
+  } catch {
+    return { success: false };
+  }
 }
 
-// تابع جدید برای ثبت کلیک
+// ثبت کلیک
 async function registerClick(adId) {
-    try {
-        const response = await fetch(`${API_BASE}/api/click/${adId}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        const data = await response.json();
-        if (data.success) {
-            console.log(`⚡️ کلیک برای تبلیغ ${adId} ثبت شد. مجموع کلیک‌ها: ${data.clicks}`);
-        } else {
-            console.error(`❌ خطا در ثبت کلیک برای تبلیغ ${adId}: ${data.message}`);
-        }
-        return data; // برای نمایش تعداد کلیک
-    } catch (error) {
-        console.error('❌ خطا در ارسال درخواست ثبت کلیک:', error);
-        return { success: false, message: 'خطای شبکه یا سرور' };
-    }
+  try {
+    const res = await fetch(`${API_BASE}/api/click/${adId}`, { method: "POST" });
+    return await res.json();
+  } catch {
+    return { success: false };
+  }
 }
 
-// گرفتن تبلیغات از سرور
+// باز کردن تبلیغ
+function openAd(url, adId) {
+  registerClick(adId);
+  window.open(url, "_blank");
+}
+
+// گرفتن تبلیغات
 async function fetchAds() {
   try {
     const res = await fetch(`${API_BASE}/api/ads`);
     return await res.json();
-  } catch (err) {
-    console.error("❌ خطا در دریافت تبلیغات:", err);
+  } catch {
     return [];
   }
 }
@@ -280,69 +270,47 @@ async function showRandomAd() {
   }
 
   const randomAd = ads[Math.floor(Math.random() * ads.length)];
+  await registerView(randomAd.id);
+
   let html = "";
-  
-  // ثبت بازدید واقعی بلافاصله پس از انتخاب تبلیغ برای نمایش
-  const viewData = await registerView(randomAd.id);
-
   if (randomAd.type === "text") {
-  html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}'); return true;">
-          ${randomAd.text}
-        </a>`;
-} else if (randomAd.type === "image") {
-  html = `<a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}'); return true;">
-          <img src="${randomAd.src}" alt="تبلیغ">
-        </a>`;
-} else if (randomAd.type === "video") {
-  html = `<video controls style="max-width:100%; border-radius:10px;">
-          <source src="${randomAd.src}" type="video/mp4">
-          مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-        </video>
-        <p><a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}'); return true;">
-          🔗 مشاهده بیشتر
-        </a></p>`;
-}
+    html = `<p>${randomAd.text}</p>
+            <button class="ad-btn" onclick="openAd('${randomAd.link}','${randomAd.id}')">🔗 مشاهده بیشتر</button>`;
+  } else if (randomAd.type === "image") {
+    html = `<img src="${randomAd.src}" alt="تبلیغ">
+            <button class="ad-btn" onclick="openAd('${randomAd.link}','${randomAd.id}')">🔗 مشاهده بیشتر</button>`;
+  } else if (randomAd.type === "video") {
+    html = `<video controls>
+              <source src="${randomAd.src}" type="video/mp4">
+              مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+            </video>
+            <button class="ad-btn" onclick="openAd('${randomAd.link}','${randomAd.id}')">🔗 مشاهده بیشتر</button>`;
+  }
 
-const viewCountHtml = viewData.success
-  ? `<p style="font-size:0.8em;color:gray;">👁 بازدید یکتا: ${viewData.views}</p>`
-  : '';
-adBox.innerHTML = html + viewCountHtml;
+  adBox.innerHTML = html;
 }
 
 // نمایش تبلیغ اول
 showRandomAd();
-
 // تغییر هر ۳۰ ثانیه
 setInterval(showRandomAd, 30000);
 
 // تنظیمات
-const settingsPanel = document.getElementById("settingsPanel");
-
 function toggleSettings() {
-    settingsPanel.classList.toggle("active");
+  document.getElementById("settingsPanel").classList.toggle("active");
 }
-
 function setTheme(mode) {
-    if (mode === "dark") {
-        document.body.classList.add("dark");
-        localStorage.setItem("theme", "dark");
-    } else {
-        document.body.classList.remove("dark");
-        localStorage.setItem("theme", "light");
-    }
+  document.body.classList.toggle("dark", mode === "dark");
+  localStorage.setItem("theme", mode);
 }
-
 function setColor(color) {
-    document.documentElement.style.setProperty("--primary-color", color);
-    localStorage.setItem("primaryColor", color);
+  document.documentElement.style.setProperty("--primary-color", color);
+  localStorage.setItem("primaryColor", color);
 }
-
 window.onload = function() {
-    const savedTheme = localStorage.getItem("theme");
-    if (savedTheme === "dark") document.body.classList.add("dark");
-
-    const savedColor = localStorage.getItem("primaryColor");
-    if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
+  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+  const savedColor = localStorage.getItem("primaryColor");
+  if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
 }
 </script>
 </body>

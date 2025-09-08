@@ -275,7 +275,8 @@ async function showRandomAd() {
   let html = "";
   if (randomAd.type === "text") {
     html = `
-      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" style="color:var(--primary-color);font-weight:bold;display:block;margin:10px 0;">
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')"
+         style="color:var(--primary-color);font-weight:bold;display:block;margin:10px 0;">
         ${randomAd.text}
       </a>
       <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">

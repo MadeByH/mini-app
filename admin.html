@@ -174,8 +174,8 @@ async function loadAds() {
           <div class="ad-info">
             <strong>شناسه: ${ad.id}</strong><br>
             ${ad.type === "text" ? `📝 متن: ${ad.text}` : ""}
-            ${ad.caption ? `<br>💬 کپشن: ${ad.caption}` : ""}
             ${preview}
+            ${ad.caption ? `<br>💬 کپشن: ${ad.caption}` : ""}
             <br>
             🔗 لینک: <a href="${ad.link}" target="_blank">${ad.link}</a>
             <div class="ad-stats">

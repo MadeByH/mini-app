@@ -10,7 +10,7 @@
         --text-color: #2c3e50;
         --card-bg: #fff;
         --footer-color: #777;
-        --primary-color: #27ae60; /* رنگ پیش‌فرض */
+        --primary-color: #27ae60;
     }
 
     body.dark {
@@ -77,7 +77,7 @@
         text-decoration: none;
         color: #fff; border-radius: 8px;
         transition: 0.3s;
-        background: var(--primary-color); /* استفاده از رنگ اصلی */
+        background: var(--primary-color);
     }
 
     .menu-btn:hover {
@@ -99,11 +99,11 @@
     }
     .ad-box {
       padding: 12px;
-      /* border: 1px dashed #ccc; */ /* حذف خط چین برای ظاهر بهتر */
+      border: 1px dashed #ccc;
       border-radius: 8px;
-      /* background: #f9f9f9; */ /* حذف پس‌زمینه خاکستری */
+      background: #f9f9f9;
       text-align: center;
-      color: var(--text-color); /* استفاده از رنگ متن اصلی */
+      color: #333;
       margin-bottom: 20px;
     }
     .ad-box img, .ad-box video {
@@ -113,22 +113,22 @@
     }
     /* دکمه تبلیغاتی */
     .ad-btn {
-        display: inline-block;
-        margin-top: 10px;
-        padding: 10px 18px;
-        font-size: 1em;
-        font-weight: bold;
-        border: none;
-        border-radius: 30px;
-        cursor: pointer;
-        background: var(--primary-color); /* استفاده از رنگ اصلی */
-        color: #fff;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        transition: 0.3s;
-    }
+    display: inline-block;
+    margin-top: 10px;
+    padding: 10px 18px;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #ff9f1c, #ff4040);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    transition: 0.3s;
+}
     .ad-btn:hover {
-        filter: brightness(1.15);
-        transform: scale(1.07);
+    filter: brightness(1.15);
+    transform: scale(1.07);
     }
 
     /* پنل تنظیمات */
@@ -224,75 +224,17 @@
 <script>
 const API_BASE = "https://mini-app-add-bot.onrender.com";
 
-// --- توابع کمکی برای مدیریت کوکی‌ها ---
-
-/**
- * تابعی برای تنظیم یک کوکی در مرورگر.
- * @param {string} name - نام کوکی.
- * @param {string} value - مقدار کوکی.
- * @param {number} days - تعداد روزهایی که کوکی باید معتبر باشد.
- */
-function setCookie(name, value, days) {
-    let expires = "";
-    if (days) {
-        const date = new Date();
-        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        expires = "; expires=" + date.toUTCString();
-    }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
-    console.log(`کوکی تنظیم شد: ${name}=${value}`);
+// ثبت بازدید
+async function registerView(adId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/view/${adId}`, { method: "POST" });
+    return await res.json();
+  } catch {
+    return { success: false };
+  }
 }
 
-/**
- * تابعی برای خواندن یک کوکی از مرورگر.
- * @param {string} name - نام کوکی که باید خوانده شود.
- * @returns {string|null} - مقدار کوکی در صورت وجود، در غیر این صورت null.
- */
-function getCookie(name) {
-    const nameEQ = name + "=";
-    const ca = document.cookie.split(';');
-    for(let i = 0; i < ca.length; i++) {
-        let c = ca[i];
-        while (c.charAt(0) === ' ') c = c.substring(1, c.length);
-        if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
-    }
-    return null;
-}
-
-// --- تابع ثبت بازدید با بررسی کوکی ---
-// این تابع جایگزین registerView اصلی می‌شود
-
-/**
- * این تابع، بازدید یک تبلیغ را ثبت می‌کند، اما فقط در صورتی که کاربر قبلاً آن تبلیغ را ندیده باشد.
- * برای این کار از کوکی‌های مرورگر استفاده می‌کند.
- * @param {string} adId - شناسه منحصر به فرد تبلیغ.
- */
-async function registerViewWithCookieCheck(adId) {
-    const cookieName = `viewed_ad_${adId}`; // نام منحصر به فرد برای هر تبلیغ
-
-    if (!getCookie(cookieName)) {
-        console.log(`[بازدید] اولین بازدید برای تبلیغ ${adId}. در حال ثبت و تنظیم کوکی...`);
-
-        // *** فراخوانی تابع اصلی ثبت بازدید از API ***
-        try {
-            const res = await fetch(`${API_BASE}/api/view/${adId}`, { method: "POST" });
-            const result = await res.json();
-            if (result.success) {
-                console.log(` >> ثبت موفقیت‌آمیز بازدید برای ${adId} در سرور.`);
-                // تنظیم کوکی فقط در صورت موفقیت ثبت در سرور
-                setCookie(cookieName, "true", 365); // کوکی برای 1 سال معتبر باشد
-            } else {
-                console.error(` >> خطای ثبت بازدید برای ${adId} از سرور:`, result);
-            }
-        } catch (error) {
-            console.error(` >> خطای شبکه یا ارتباطی در ثبت بازدید برای ${adId}:`, error);
-        }
-    } else {
-        console.log(`[بازدید] کاربر قبلاً تبلیغ ${adId} را دیده است. بازدید مجدد ثبت نمی‌شود.`);
-    }
-}
-
-// ثبت کلیک (همانند قبل)
+// ثبت کلیک
 async function registerClick(adId) {
   try {
     const res = await fetch(`${API_BASE}/api/click/${adId}`, { method: "POST" });
@@ -302,91 +244,73 @@ async function registerClick(adId) {
   }
 }
 
-// باز کردن تبلیغ (با استفاده از registerClick)
+// باز کردن تبلیغ
 function openAd(url, adId) {
   registerClick(adId);
   window.open(url, "_blank");
 }
 
-// گرفتن تبلیغات (همانند قبل)
+// گرفتن تبلیغات
 async function fetchAds() {
   try {
     const res = await fetch(`${API_BASE}/api/ads`);
     return await res.json();
   } catch {
-    console.error("خطا در دریافت تبلیغات از API.");
     return [];
   }
 }
 
-// تابع نمایش تبلیغ (اصلاح شده)
-async function showRandomAd() {
-  const ads = await fetchAds();
-  const adBox = document.getElementById("adBox");
+async function showRandomAd() {  
+  const ads = await fetchAds();  
+  const adBox = document.getElementById("adBox");  
+  
+  if (ads.length === 0) {  
+    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";  
+    return;  
+  }  
+  
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];  
+  await registerView(randomAd.id);  
+  
+  let html = "";  
+  if (randomAd.type === "text") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      ${randomAd.text}  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده تبلیغ  
+    </a>`;  
+} else if (randomAd.type === "image") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      <img src="${randomAd.src}" alt="تبلیغ">  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده تبلیغ  
+    </a>`;  
+} else if (randomAd.type === "video") {  
+  html = `  
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">  
+      <video controls style="max-width:100%; border-radius:10px;">  
+        <source src="${randomAd.src}" type="video/mp4">  
+        مرورگر شما از ویدیو پشتیبانی نمی‌کند.  
+      </video>  
+    </a>  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">  
+      🔗 مشاهده بیشتر  
+    </a>`;  
+    }  
+  
+  adBox.innerHTML = html;  
+    }
 
-  if (!ads || ads.length === 0) {
-    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";
-    return;
-  }
-
-  const randomAd = ads[Math.floor(Math.random() * ads.length)];
-
-  // *** فراخوانی تابع جدید برای ثبت بازدید با بررسی کوکی ***
-  await registerViewWithCookieCheck(randomAd.id);
-
-  let html = "";
-  // منطق نمایش HTML برای انواع تبلیغات (حفظ شده از کد شما)
-  if (randomAd.type === "text") {
-    // استفاده از template literal برای راحتی خوانایی
-    html = `
-      <div style="margin-bottom: 15px;">
-        <a href="javascript:void(0);" onclick="openAd('${randomAd.link}', '${randomAd.id}')"
-           style="color:var(--primary-color);font-weight:bold;display:block;margin-bottom:8px;">
-          ${randomAd.text}
-        </a>
-        <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-          🔗 مشاهده تبلیغ
-        </button>
-      </div>`;
-  } else if (randomAd.type === "image") {
-    html = `
-      <div style="margin-bottom: 15px;">
-        <a href="javascript:void(0);" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-          <img src="${randomAd.src}" alt="تبلیغ تصویری">
-        </a>
-        <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-          🔗 مشاهده تبلیغ
-        </button>
-      </div>`;
-  } else if (randomAd.type === "video") {
-    html = `
-      <div style="margin-bottom: 15px;" onclick="openAd('${randomAd.link}', '${randomAd.id}')" style="cursor:pointer;">
-        <video controls style="max-width:100%; border-radius:10px;">
-          <source src="${randomAd.src}" type="video/mp4">
-          مرورگر شما از پخش ویدیو پشتیبانی نمی‌کند.
-        </video>
-      </div>
-      <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-        🔗 مشاهده بیشتر
-      </button>`;
-  } else {
-    console.warn(`نوع تبلیغ ناشناخته: ${randomAd.type}`);
-    html = `<p>نوع تبلیغ پشتیبانی نمی‌شود.</p>`;
-  }
-
-  adBox.innerHTML = html;
-}
-
-// --- مدیریت اولیه و دوره‌ای تبلیغات ---
-
-// نمایش تبلیغ اول هنگام بارگذاری صفحه
-document.addEventListener('DOMContentLoaded', showRandomAd);
-
-// تغییر تبلیغ هر 30 ثانیه (30000 میلی‌ثانیه)
-// توجه: اگر کاربر کوکی داشته باشد، این فراخوانی مجدد هم بازدید تکراری ثبت نمی‌کند.
+// نمایش تبلیغ اول
+showRandomAd();
+// تغییر هر ۳۰ ثانیه
 setInterval(showRandomAd, 30000);
 
-// --- تنظیمات (همانند قبل) ---
+// تنظیمات
 function toggleSettings() {
   document.getElementById("settingsPanel").classList.toggle("active");
 }
@@ -395,23 +319,13 @@ function setTheme(mode) {
   localStorage.setItem("theme", mode);
 }
 function setColor(color) {
-  // به روز رسانی رنگ اصلی در CSS متغیرها
   document.documentElement.style.setProperty("--primary-color", color);
-  // ذخیره رنگ انتخابی کاربر
   localStorage.setItem("primaryColor", color);
 }
-// بارگذاری تنظیمات ذخیره شده هنگام باز شدن صفحه
 window.onload = function() {
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) {
-    document.body.classList.toggle("dark", savedTheme === "dark");
-  }
+  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
   const savedColor = localStorage.getItem("primaryColor");
-  if (savedColor) {
-    document.documentElement.style.setProperty("--primary-color", savedColor);
-  }
-  // فراخوانی showRandomAd در اینجا هم منطقی است اگر نیاز باشد
-  // showRandomAd(); // قبلا در DOMContentLoaded فراخوانی شده
+  if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);
 }
 </script>
 </body>

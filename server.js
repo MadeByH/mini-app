@@ -67,14 +67,14 @@ app.post("/api/ads", (req, res) => {
   }
 
   let ads = loadAds();
-  const { id, type, text, src, link } = req.body;
+  const { id, type, text, src, link, caption } = req.body;
 
   // بررسی اینکه ID تکراری نباشه
   if (ads.find((a) => a.id === id)) {
     return res.status(400).json({ message: "❌ این ID قبلاً استفاده شده است." });
   }
 
-  const newAd = { id, type, text, src, link };
+  const newAd = { id, type, text, src, link, caption };
   ads.push(newAd);
   saveAds(ads);
 

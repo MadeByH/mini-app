@@ -274,32 +274,36 @@ async function showRandomAd() {
 
   let html = "";
   if (randomAd.type === "text") {
-  html = `
-    <div onclick="openAd('${randomAd.link}', '${randomAd.id}')" style="cursor:pointer;color:var(--primary-color);font-weight:bold;">
-      ${randomAd.text}
-    </div>
-    <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-      🔗 مشاهده تبلیغ
-    </button>`;
-} else if (randomAd.type === "image") {
-  html = `
-    <img src="${randomAd.src}" alt="تبلیغ" style="cursor:pointer;" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-    <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-      🔗 مشاهده تبلیغ
-    </button>`;
-} else if (randomAd.type === "video") {
-  html = `
-    <video controls style="max-width:100%; border-radius:10px; cursor:pointer;" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-      <source src="${randomAd.src}" type="video/mp4">
-      مرورگر شما از ویدیو پشتیبانی نمی‌کند.
-    </video>
-    <button class="ad-btn" onclick="openAd('${randomAd.link}', '${randomAd.id}')">
-      🔗 مشاهده بیشتر
-    </button>`;
-    }
+    html = `
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" style="color:var(--primary-color);font-weight:bold;display:block;margin:10px 0;">
+        ${randomAd.text}
+      </a>
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
+        🔗 مشاهده تبلیغ
+      </a>`;
+  } else if (randomAd.type === "image") {
+    html = `
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+        <img src="${randomAd.src}" alt="تبلیغ" style="cursor:pointer; max-width:100%; border-radius:10px;">
+      </a>
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
+        🔗 مشاهده تبلیغ
+      </a>`;
+  } else if (randomAd.type === "video") {
+    html = `
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">
+        <video controls style="max-width:100%; border-radius:10px;">
+          <source src="${randomAd.src}" type="video/mp4">
+          مرورگر شما از ویدیو پشتیبانی نمی‌کند.
+        </video>
+      </a>
+      <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')" class="ad-btn">
+        🔗 مشاهده بیشتر
+      </a>`;
+  }
 
   adBox.innerHTML = html;
-}
+    }
 
 // نمایش تبلیغ اول
 showRandomAd();

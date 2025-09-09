@@ -51,6 +51,16 @@ button:hover { background:#219150; }
   <label>شناسه منحصر به فرد (ID):</label>
   <input type="text" id="adId" placeholder="مثال: banner_top, promo_fall"/>
 
+  <label>نوع محدودیت:</label>
+  <select id="limitType">
+    <option value="">❌ بدون محدودیت</option>
+    <option value="views">👁 بر اساس بازدید</option>
+    <option value="clicks">⚡ بر اساس کلیک</option>
+  </select>
+
+  <label>تعداد سقف:</label>
+  <input type="number" id="limitCount" placeholder="مثال: 100" />
+
   <button onclick="saveAd()">➕ افزودن/به‌روزرسانی تبلیغ</button>
 
   <div class="ad-list" id="adList">
@@ -97,13 +107,15 @@ async function saveAd() {
   const link = document.getElementById("adLink").value.trim();
   const caption = document.getElementById("adCaption").value.trim();
   const id = document.getElementById("adId").value.trim();
+  const limitType = document.getElementById("limitType").value;
+  const limitCount = parseInt(document.getElementById("limitCount").value) || null;
 
   if (!content || !link || !id) {
-    alert("⚠️ لطفا همه فیلدها را پر کنید!");
+    alert("⚠️ لطفا همه فیلدهای اجباری را پر کنید!");
     return;
   }
 
-  const adData = { id, type, link, caption };
+  const adData = { id, type, link, caption, limitType, limitCount };
   if (type === "text") adData.text = content;
   else adData.src = content;
 
@@ -178,6 +190,7 @@ async function loadAds() {
             ${ad.caption ? `<br>💬 کپشن: ${ad.caption}` : ""}
             <br>
             🔗 لینک: <a href="${ad.link}" target="_blank">${ad.link}</a>
+            ${ad.limitType ? `<br>📌 محدودیت: ${ad.limitType === "views" ? "بازدید" : "کلیک"} تا ${ad.limitCount}` : ""}
             <div class="ad-stats">
               <span>👁 بازدید: ${ad.views}</span>
               <span>⚡️ کلیک: ${ad.clicks}</span>

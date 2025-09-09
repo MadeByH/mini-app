@@ -48,14 +48,28 @@ app.use(express.static(__dirname)); // همه فایل‌ها کنار هم
 // 📌 گرفتن لیست تبلیغات
 app.get("/api/ads", (req, res) => {
   const ads = loadAds();
-  const adsWithStats = ads.map((ad) => {
-    ensureAdStats(ad.id);
-    return {
-      ...ad,
-      views: adStats[ad.id].views,
-      clicks: adStats[ad.id].clicks,
-    };
-  });
+  const adsWithStats = ads
+    .map((ad) => {
+      ensureAdStats(ad.id);
+
+      // بررسی محدودیت
+      let isActive = true;
+      if (ad.limitType === "views" && ad.limitCount && adStats[ad.id].views >= ad.limitCount) {
+        isActive = false;
+      }
+      if (ad.limitType === "clicks" && ad.limitCount && adStats[ad.id].clicks >= ad.limitCount) {
+        isActive = false;
+      }
+
+      return {
+        ...ad,
+        views: adStats[ad.id].views,
+        clicks: adStats[ad.id].clicks,
+        active: isActive
+      };
+    })
+    .filter(ad => ad.active); // فقط تبلیغ‌های فعال
+
   res.json(adsWithStats);
 });
 
@@ -67,14 +81,14 @@ app.post("/api/ads", (req, res) => {
   }
 
   let ads = loadAds();
-  const { id, type, text, src, link, caption } = req.body;
+  const { id, type, text, src, link, caption, limitType, limitCount } = req.body;
 
   // بررسی اینکه ID تکراری نباشه
   if (ads.find((a) => a.id === id)) {
     return res.status(400).json({ message: "❌ این ID قبلاً استفاده شده است." });
   }
 
-  const newAd = { id, type, text, src, link, caption };
+  const newAd = { id, type, text, src, link, caption, limitType, limitCount };
   ads.push(newAd);
   saveAds(ads);
 

@@ -45,6 +45,11 @@
 <!-- 📌 کتابخانه مینی‌اپ بله -->
 <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 <script>
+    // اعلام آماده بودن
+    if (window.WebApp && WebApp.ready) {
+        WebApp.ready();
+    }
+
     // باز کردن لینک در مینی‌اپ بله یا مرورگر
     function openBaleLink(url) {
         if (window.WebApp && WebApp.openLink) {
@@ -96,7 +101,7 @@
         }
         document.body.removeChild(textArea);
     }
-</script>
+            </script>
 </head>
 <body>
 <div class="container">

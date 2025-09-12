@@ -225,6 +225,10 @@
 <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 
 <script>
+// اعلام آماده بودن مینی‌اپ
+if (window.WebApp && WebApp.ready) {
+  WebApp.ready();
+}
 const API_BASE = "https://mini-app-add-bot.onrender.com";
 
 // ساختن شناسه کاربر (یکبار)
@@ -264,12 +268,12 @@ async function registerClick(adId) {
 // 📌 باز کردن لینک در مینی‌اپ بله
 function openAd(url, adId) {
   registerClick(adId);
-  if (typeof WebApp !== "undefined") {
+  if (window.WebApp && WebApp.openLink) {
     WebApp.openLink(url, { try_instant_view: true });
   } else {
     window.open(url, "_blank");
   }
-}
+    }
 
 // گرفتن تبلیغات
 async function fetchAds() {

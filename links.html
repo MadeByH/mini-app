@@ -33,7 +33,6 @@
     .copy-button:hover { background-color: #e0e0e0; }
     .copy-button::before { content: "📋"; font-size: 1em; line-height: 1; }
 
-    /* ✅ همه لوگوها یک اندازه */
     .icon {
         width: 22px;
         height: 22px;
@@ -42,13 +41,69 @@
         margin-left: 8px;
     }
 </style>
+
+<!-- 📌 کتابخانه مینی‌اپ بله -->
+<script src="https://tapi.bale.ai/miniapp.js?3"></script>
+<script>
+    // باز کردن لینک در مینی‌اپ بله یا مرورگر
+    function openBaleLink(url) {
+        if (window.WebApp && WebApp.openLink) {
+            WebApp.openLink(url, { try_instant_view: true });
+        } else {
+            window.open(url, "_blank");
+        }
+    }
+
+    // کپی کردن لینک
+    function copyLink(elementId) {
+        const linkElement = document.getElementById(elementId);
+        const linkToCopy = linkElement.href;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(linkToCopy).then(() => {
+                const successMessage = document.createElement('div');
+                successMessage.textContent = 'لینک با موفقیت کپی شد!';
+                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
+                document.body.appendChild(successMessage);
+
+                function fadeInOut() {
+                    successMessage.style.opacity = '1';
+                    setTimeout(() => {
+                        successMessage.style.opacity = '0';
+                        setTimeout(() => { successMessage.remove(); }, 1000);
+                    }, 2000);
+                }
+                fadeInOut();
+            }).catch(err => {
+                console.error('خطا در کپی کردن لینک: ', err);
+                fallbackCopyTextToClipboard(linkToCopy);
+            });
+        } else {
+            fallbackCopyTextToClipboard(linkToCopy);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            alert('لینک با موفقیت کپی شد! (روش جایگزین)');
+        } catch (err) {
+            alert('خطا در کپی کردن لینک: ' + text);
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
 </head>
 <body>
 <div class="container">
     <h1>🔗 کانال‌ها و ربات‌ها</h1>
 
     <!-- لینک‌های بله -->
-    <a href="https://ble.ir/add_members_bot?startapp" class="button">
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/add_members_bot?startapp')">
         <img src="bale.png" alt="بله" class="icon"> ربات بله
     </a>
     <div class="help-text">
@@ -57,7 +112,7 @@
         <button class="copy-button" onclick="copyLink('ble-bot-link')">کپی</button>
     </div>
 
-    <a href="https://ble.ir/channel_member_and_manager_bot?startapp" class="button">
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/channel_member_and_manager_bot?startapp')">
         <img src="bale.png" alt="بله" class="icon"> کانال بله
     </a>
     <div class="help-text">
@@ -108,49 +163,5 @@
     <!-- دکمه بازگشت -->
     <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
 </div>
-
-<script>
-    function copyLink(elementId) {
-        const linkElement = document.getElementById(elementId);
-        const linkToCopy = linkElement.href;
-
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(linkToCopy).then(() => {
-                const successMessage = document.createElement('div');
-                successMessage.textContent = 'لینک با موفقیت کپی شد!';
-                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
-                document.body.appendChild(successMessage);
-
-                function fadeInOut() {
-                    successMessage.style.opacity = '1';
-                    setTimeout(() => {
-                        successMessage.style.opacity = '0';
-                        setTimeout(() => { successMessage.remove(); }, 1000);
-                    }, 2000);
-                }
-                fadeInOut();
-            }).catch(err => {
-                console.error('خطا در کپی کردن لینک: ', err);
-                fallbackCopyTextToClipboard(linkToCopy);
-            });
-        } else {
-            fallbackCopyTextToClipboard(linkToCopy);
-        }
-    }
-
-    function fallbackCopyTextToClipboard(text) {
-        const textArea = document.createElement("textarea");
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        try {
-            document.execCommand('copy');
-            alert('لینک با موفقیت کپی شد! (روش جایگزین)');
-        } catch (err) {
-            alert('خطا در کپی کردن لینک: ' + text);
-        }
-        document.body.removeChild(textArea);
-    }
-</script>
 </body>
 </html>

@@ -1,287 +1,349 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>فروشگاه و خدمات ربات</title>
-    <link rel="stylesheet" href="style.css"> <!-- فرض می‌کنیم style.css دارید -->
-    <style>
-        /* استایل‌های اصلی اینجا قرار می‌گیرد */
-        body { font-family: sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; color: #333; }
-        header { background-color: #4CAF50; color: white; padding: 15px; text-align: center; position: relative; }
-        .settings-button { position: absolute; left: 15px; top: 15px; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .content { padding: 20px; text-align: center; }
-        .content button, .ad-button { background-color: #4CAF50; color: white; padding: 12px 25px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
-        .content button:hover, .ad-button:hover { background-color: #45a049; }
-        .ad-section { background-color: #e0e0e0; padding: 15px; margin-top: 20px; border-radius: 8px; text-align: center; min-height: 100px; display: flex; justify-content: center; align-items: center;}
-        .ad-content img, .ad-content video { max-width: 100%; height: auto; border-radius: 5px; margin-top: 10px;}
-        footer { text-align: center; padding: 10px; margin-top: 30px; font-size: 12px; color: #777; }
-        #settings-panel { display: none; position: fixed; top: 0; right: 0; width: 250px; background-color: #fff; box-shadow: -2px 0 5px rgba(0,0,0,0.2); padding: 20px; height: 100%; z-index: 1000; }
-        #settings-panel.dark { background-color: #333; color: white; }
-        #settings-panel button { width: calc(100% - 10px); margin-bottom: 10px; }
-        .theme-switcher { display: flex; align-items: center; margin-bottom: 15px; }
-        .theme-switcher label { margin-right: 10px; }
-        .color-picker { margin-bottom: 15px; }
-        .color-picker label { display: block; margin-bottom: 5px; }
-        .color-picker input[type="color"] { width: 50px; height: 30px; border: none; cursor: pointer; vertical-align: middle; }
-        /* اضافه کردن استایل برای رنگ اصلی */
-        :root { --primary-color: #4CAF50; }
-        .dark { --primary-color: #66bb6a; }
-        .content button, .ad-button, header, #settings-panel.dark button { background-color: var(--primary-color) !important; }
-        .content button:hover, .ad-button:hover { background-color: #45a049 !important; } /* ممکن است نیاز به تنظیم رنگ هاوِر باشد */
-    </style>
-</head>
-<body>
-
-    <header>
-        <!-- لوگو اینجا قرار می‌گیرد -->
-        <h1>فروشگاه و خدمات ربات</h1>
-        <button class="settings-button" onclick="toggleSettings()">⚙️</button>
-    </header>
-
-    <main class="content">
-        <button onclick="openLink('https://t.me/your_buy_coin_link')">خرید سکه</button>
-        <button onclick="openLink('https://t.me/your_ads_tariff_link')">تعرفه تبلیغات</button>
-        <button onclick="openLink('https://t.me/your_guide_link')">راهنما</button>
-        <button onclick="openLink('https://t.me/your_channels_bots_link')">کانال‌ها و ربات‌ها</button>
-    </main>
-
-    <section class="ad-section">
-        <div id="ad-display">
-            <!-- تبلیغات اینجا نمایش داده می‌شود -->
-            در حال بارگذاری تبلیغات...
-        </div>
-    </section>
-
-    <footer>
-        <p>&copy; 2024 فروشگاه و خدمات ربات. تمامی حقوق محفوظ است.</p>
-    </footer>
-
-    <!-- پنل تنظیمات -->
-    <div id="settings-panel">
-        <h2>تنظیمات</h2>
-        <div class="theme-switcher">
-            <label for="themeToggle">حالت شب:</label>
-            <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
-        </div>
-        <div class="color-picker">
-            <label for="primaryColorPicker">رنگ اصلی:</label>
-            <input type="color" id="primaryColorPicker" value="#4CAF50" onchange="updatePrimaryColor()">
-        </div>
-        <button onclick="toggleSettings()" style="background-color: var(--primary-color);">بستن</button>
-    </div>
-
-    <!-- اسکریپت‌ها -->
-    <script src="https://tapi.bale.ai/miniapp.js?3"></script>
-    <script>
-        // ---- تنظیمات اولیه ----
-        let currentAd = null;
-        const ADS_API_URL = 'https://mini-app-add-bot.onrender.com/ads'; // URL API تبلیغات
-
-        // ---- توابع کمکی ----
-        function getElement(id) {
-            return document.getElementById(id);
-        }
-
-        // ---- توابع مینی‌اپ بله ----
-        function initializeBaleMiniApp() {
-            if (window.WebApp) {
-                // تلاش برای آماده‌سازی مینی‌اپ
-                //WebApp.ready(); // این خط باید در جایی اجرا شود که مطمئن باشیم WebApp مقداردهی شده است
-
-                // اگر WebApp.ready() در زمان بارگذاری اولیه اجرا نشود، ممکن است لازم باشد بعداً صدا زده شود.
-                // اما معمولا با بارگذاری script باید آماده باشد.
-
-                console.log("Bale WebApp SDK is available.");
-            } else {
-                console.error("Bale WebApp SDK is not available. Are you running this inside the Bale app?");
-            }
-        }
-
-        // ---- توابع مربوط به لینک‌ها و تبلیغات ----
-
-        // تابع اصلی برای باز کردن لینک‌ها
-        function openLink(url) {
-            console.log(`Attempting to open link: ${url}`);
-            if (window.WebApp && window.WebApp.openLink) {
-                try {
-                    // WebApp.openLink(url, { try_instant_view: true }); // با این پارامتر تست کنید
-                    window.WebApp.openLink(url); // بدون پارامتر تست کنید
-                    console.log("Opened link using WebApp.openLink.");
-                } catch (error) {
-                    console.error("Error using WebApp.openLink:", error);
-                    // اگر WebApp.openLink خطا داد، به fallback متوسل شوید
-                    window.open(url, "_blank");
-                    console.log("Falling back to window.open.");
-                }
-            } else {
-                // اگر WebApp در دسترس نباشد (یعنی در مرورگر عادی هستیم)
-                window.open(url, "_blank");
-                console.log("WebApp not available, opened link using window.open.");
-            }
-        }
-
-        // ثبت کلیک روی تبلیغ (شما باید این تابع را پیاده‌سازی کنید)
-        function registerClick(adId) {
-            console.log(`Registering click for ad ID: ${adId}`);
-            // فرض می‌کنیم شما یک API دارید که با این URL تماس می‌گیرد
-            fetch(ADS_API_URL + '/click', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adId: adId, botId: 'YOUR_BOT_ID' /* شناسه ربات خود را اینجا قرار دهید */ })
-            }).then(response => {
-                if (!response.ok) console.error("Failed to register click:", response.statusText);
-            }).catch(error => {
-                console.error("Error registering click:", error);
-            });
-        }
-
-        // دریافت تبلیغات از API
-        async function fetchAds() {
-            console.log("Fetching ads...");
-            try {
-                const response = await fetch(ADS_API_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const ads = await response.json();
-                console.log("Ads fetched:", ads);
-                return ads;
-            } catch (error) {
-                console.error("Failed to fetch ads:", error);
-                getElement('ad-display').innerHTML = 'خطا در بارگذاری تبلیغات.';
-                return [];
-            }
-        }
-
-        // نمایش یک تبلیغ تصادفی
-        function showRandomAd(ads) {
-            if (!ads || ads.length === 0) {
-                getElement('ad-display').innerHTML = 'تبلیغی برای نمایش وجود ندارد.';
-                return;
-            }
-            const adIndex = Math.floor(Math.random() * ads.length);
-            currentAd = ads[adIndex];
-            const adDisplay = getElement('ad-display');
-
-            let adHtml = '';
-            if (currentAd.type === 'text') {
-                adHtml = `<p>${currentAd.content}</p>`;
-            } else if (currentAd.type === 'image' && currentAd.url) {
-                adHtml = `<img src="${currentAd.url}" alt="تبلیغ تصویری">`;
-            } else if (currentAd.type === 'video' && currentAd.url) {
-                adHtml = `<video controls src="${currentAd.url}"></video>`;
-            } else {
-                adHtml = '<p>فرمت تبلیغ نامشخص است.</p>';
-            }
-
-            // افزودن دکمه کلیک به تبلیغ
-            const adButtonHtml = `<button class="ad-button" onclick="handleAdClick('${currentAd.id}', '${currentAd.link}')">مشاهده تبلیغ</button>`;
-            adDisplay.innerHTML = adHtml + adButtonHtml;
-        }
-
-        // مدیریت کلیک روی دکمه تبلیغ
-        function handleAdClick(adId, adLink) {
-            registerClick(adId); // ثبت کلیک قبل از باز کردن لینک
-            openLink(adLink);   // باز کردن لینک تبلیغ
-        }
-
-        // بارگذاری و نمایش تبلیغات اولیه و تنظیم آپدیت دوره‌ای
-        async function loadAndShowAds() {
-            const ads = await fetchAds();
-            showRandomAd(ads);
-            // آپدیت تبلیغ هر 30 ثانیه
-            setInterval(() => showRandomAd(ads), 30000);
-        }
-
-        // ---- توابع تنظیمات ----
-        function toggleSettings() {
-            const panel = getElement('settings-panel');
-            panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
-        }
-
-        function setTheme(isDark) {
-            if (isDark) {
-                document.body.classList.add('dark');
-                getElement('settings-panel').classList.add('dark');
-            } else {
-                document.body.classList.remove('dark');
-                getElement('settings-panel').classList.remove('dark');
-            }
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-
-        function toggleTheme() {
-            const isDark = document.body.classList.toggle('dark');
-            getElement('settings-panel').classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-        }
-
-        function updatePrimaryColor() {
-            const colorPicker = getElement('primaryColorPicker');
-            const color = colorPicker.value;
-            document.documentElement.style.setProperty('--primary-color', color);
-            localStorage.setItem('primaryColor', color);
-
-            // به‌روزرسانی رنگ دکمه بستن پنل تنظیمات
-            const closeButton = getElement('settings-panel').querySelector('button');
-            if (closeButton) {
-                closeButton.style.backgroundColor = color;
-            }
-        }
-
-        // ---- اجرای اولیه ----
-        document.addEventListener('DOMContentLoaded', () => {
-            // **مهم:** مقداردهی اولیه WebApp باید اینجا یا قبل از آن انجام شود
-            initializeBaleMiniApp();
-
-            // بارگذاری تنظیمات ذخیره شده
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                setTheme(true);
-                getElement('themeToggle').checked = true;
-            } else {
-                setTheme(false);
-                getElement('themeToggle').checked = false;
-            }
-
-            const savedColor = localStorage.getItem('primaryColor');
-            if (savedColor) {
-                getElement('primaryColorPicker').value = savedColor;
-                document.documentElement.style.setProperty('--primary-color', savedColor);
-                 const closeButton = getElement('settings-panel').querySelector('button');
-                if (closeButton) {
-                    closeButton.style.backgroundColor = savedColor;
-                }
-            } else {
-                 // اگر رنگی ذخیره نشده بود، رنگ پیش‌فرض را تنظیم کن
-                updatePrimaryColor();
-            }
-
-
-            // بارگذاری تبلیغات
-            loadAndShowAds();
-
-            // اطمینان از فراخوانی WebApp.ready() در صورت نیاز
-            // اگر WebApp SDK به صورت خودکار آماده نشود، ممکن است نیاز باشد این خط را فعال کنید:
-            // if (window.WebApp && window.WebApp.ready) {
-            //     window.WebApp.ready();
-            //     console.log("WebApp.ready() called manually.");
-            // }
-        });
-
-        // اگر از $ استفاده می‌کنید (مثلا با jQuery)، اطمینان حاصل کنید که $ تعریف شده است
-        // اگر این کد را در محیطی اجرا می‌کنید که $ به معنی document.ready است،
-        // ممکن است نیاز باشد این کد را درون آن قرار دهید.
-
-        // مثال: اگر از jQuery استفاده می‌کنید:
-        /*
-        $(document).ready(function() {
-            initializeBaleMiniApp();
-            // ... سایر کدهای بارگذاری ...
-            loadAndShowAds();
-        });
-        */
-
-    </script>
-
-</body>
+<!DOCTYPE html>  
+<html lang="fa">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
+<title>فروشگاه و خدمات ربات</title>  
+<style>  
+    :root {  
+        --bg-color: #f4f6f9;  
+        --text-color: #2c3e50;  
+        --card-bg: #fff;  
+        --footer-color: #777;  
+        --primary-color: #27ae60;  
+    }  
+  
+    body.dark {  
+        --bg-color: #1e272e;  
+        --text-color: #f5f6fa;  
+        --card-bg: #2f3640;  
+        --footer-color: #aaa;  
+    }  
+  
+    body {  
+        font-family: Tahoma, sans-serif;  
+        background: var(--bg-color);  
+        margin: 0; padding: 0;  
+        direction: rtl; text-align: right;  
+        transition: background 0.3s, color 0.3s;  
+    }  
+  
+    header {  
+        position: fixed;  
+        top: 0; left: 0; right: 0;  
+        background: var(--card-bg);  
+        color: var(--text-color);  
+        padding: 10px 20px;  
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);  
+        display: flex; justify-content: space-between; align-items: center;  
+        z-index: 10;  
+    }  
+  
+    .logo-title {  
+        display: flex; align-items: center; gap: 10px;  
+    }  
+  
+    .logo-title img {  
+        width: 40px; height: 40px;  
+        border-radius: 8px;  
+    }  
+  
+    .logo-title h1 {  
+        font-size: 1.2em;  
+        margin: 0;  
+        color: var(--text-color);  
+    }  
+  
+    .settings-btn {  
+        font-size: 1.4em;  
+        cursor: pointer;  
+    }  
+  
+    .container {  
+        max-width: 600px;  
+        margin: 80px auto 40px;  
+        padding: 25px;  
+        background: var(--card-bg);  
+        border-radius: 15px;  
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);  
+        transition: background 0.3s;  
+    }  
+  
+    .menu-btn {  
+        display: block; width: 100%;  
+        margin: 12px 0; padding: 14px;  
+        text-align: center;  
+        font-size: 1.2em; font-weight: bold;  
+        text-decoration: none;  
+        color: #fff; border-radius: 8px;  
+        transition: 0.3s;  
+        background: var(--primary-color);  
+    }  
+  
+    .menu-btn:hover {  
+        opacity: 0.9; transform: scale(1.05);  
+    }  
+  
+    .footer {  
+        text-align: center; margin-top: 25px;  
+        font-size: 0.9em; color: var(--footer-color);  
+    }  
+  
+    /* تبلیغات */  
+    .ads-section {  
+      margin-top: 30px;  
+      padding: 15px;  
+      background: var(--card-bg);  
+      border-radius: 12px;  
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);  
+    }  
+    .ad-box {  
+      padding: 12px;  
+      border: 1px dashed #ccc;  
+      border-radius: 8px;  
+      background: #f9f9f9;  
+      text-align: center;  
+      color: #333;  
+      margin-bottom: 20px;  
+    }  
+    .ad-box img, .ad-box video {  
+      max-width: 100%;  
+      border-radius: 10px;  
+      margin: 10px 0;  
+    }  
+    /* دکمه تبلیغاتی */  
+    .ad-btn {  
+    display: inline-block;  
+    margin-top: 10px;  
+    padding: 10px 18px;  
+    font-size: 1em;  
+    font-weight: bold;  
+    border: none;  
+    border-radius: 30px;  
+    cursor: pointer;  
+    background: linear-gradient(135deg, #ff9f1c, #ff4040);  
+    color: #fff;  
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);  
+    transition: 0.3s;  
+}  
+    .ad-btn:hover {  
+    filter: brightness(1.15);  
+    transform: scale(1.07);  
+    }  
+  
+    /* پنل تنظیمات */  
+    .settings-panel {  
+        position: fixed; top: 0; right: -300px;  
+        width: 270px; height: 100%;  
+        background: var(--card-bg);  
+        box-shadow: -3px 0 10px rgba(0,0,0,0.2);  
+        padding: 20px;  
+        transition: 0.3s;  
+        z-index: 20;  
+    }  
+  
+    .settings-panel.active { right: 0; }  
+  
+    .settings-panel h2 {  
+        margin-top: 0; font-size: 1.3em; color: var(--text-color);  
+    }  
+  
+    .settings-option { margin: 20px 0; }  
+  
+    .toggle-btn {  
+        cursor: pointer;  
+        padding: 8px 14px;  
+        border: none;  
+        border-radius: 6px;  
+        font-weight: bold;  
+        margin: 5px;  
+    }  
+  
+    .toggle-btn.dark { background: #2c3e50; color: #fff; }  
+    .toggle-btn.light { background: #ecf0f1; color: #2c3e50; }  
+  
+    .color-palette {  
+        display: flex; gap: 10px; margin-top: 10px;  
+    }  
+  
+    .color-circle {  
+        width: 30px; height: 30px;  
+        border-radius: 50%;  
+        cursor: pointer;  
+        border: 2px solid #ccc;  
+    }  
+</style>  
+</head>  
+<body>  
+<header>  
+    <div class="logo-title">  
+        <img src="https://i.ibb.co/MmjCz87/Picsart-25-08-03-15-36-42-181.jpg" alt="لوگو">  
+        <h1>فروشگاه و خدمات ربات</h1>  
+    </div>  
+    <span class="settings-btn" onclick="toggleSettings()">⚙️</span>  
+</header>  
+  
+<div class="container">  
+    <a href="coins.html" class="menu-btn">💰 خرید سکه</a>  
+    <a href="ads.html" class="menu-btn">📢 تعرفه تبلیغات</a>  
+    <a href="guide.html" class="menu-btn">📖 راهنما</a>  
+    <a href="links.html" class="menu-btn">🔗 کانال‌ها و ربات‌ها</a>  
+  
+    <!-- 📢 تبلیغات -->  
+    <div class="ads-section" id="adsSection">  
+      <h2>📢 تبلیغات</h2>  
+      <div class="ad-box" id="adBox">  
+        <p>در حال بارگذاری تبلیغات...</p>  
+      </div>  
+    </div>  
+  
+    <div class="footer">&copy; 2025 فروشگاه و خدمات ربات</div>  
+</div>  
+  
+<div class="settings-panel" id="settingsPanel">  
+    <h2>⚙️ تنظیمات</h2>  
+  
+    <div class="settings-option">  
+        <p>حالت نمایش:</p>  
+        <button class="toggle-btn light" onclick="setTheme('light')">☀️ روز</button>  
+        <button class="toggle-btn dark" onclick="setTheme('dark')">🌙 شب</button>  
+    </div>  
+  
+    <div class="settings-option">  
+        <p>رنگ اصلی:</p>  
+        <div class="color-palette">  
+            <div class="color-circle" style="background:#27ae60" onclick="setColor('#27ae60')"></div>  
+            <div class="color-circle" style="background:#3498db" onclick="setColor('#3498db')"></div>  
+            <div class="color-circle" style="background:#9b59b6" onclick="setColor('#9b59b6')"></div>  
+            <div class="color-circle" style="background:#e67e22" onclick="setColor('#e67e22')"></div>  
+            <div class="color-circle" style="background:#e74c3c" onclick="setColor('#e74c3c')"></div>  
+        </div>  
+    </div>  
+</div>  
+  
+<script>  
+const API_BASE = "https://mini-app-add-bot.onrender.com";  
+  
+// ساختن شناسه کاربر (یکبار)  
+function getViewerId() {  
+  let id = localStorage.getItem("viewerId");  
+  if (!id) {  
+    id = "v_" + Math.random().toString(36).substr(2, 9);  
+    localStorage.setItem("viewerId", id);  
+  }  
+  return id;  
+}  
+  
+// ثبت بازدید  
+async function registerView(adId) {  
+  try {  
+    const res = await fetch(`${API_BASE}/api/view/${adId}`, {  
+      method: "POST",  
+      headers: { "Content-Type": "application/json" },  
+      body: JSON.stringify({ viewerId: getViewerId() })  
+    });  
+    return await res.json();  
+  } catch {  
+    return { success: false };  
+  }  
+    }  
+  
+// ثبت کلیک  
+async function registerClick(adId) {  
+  try {  
+    const res = await fetch(`${API_BASE}/api/click/${adId}`, { method: "POST" });  
+    return await res.json();  
+  } catch {  
+    return { success: false };  
+  }  
+}  
+  
+// باز کردن تبلیغ  
+function openAd(url, adId) {  
+  registerClick(adId);  
+  window.open(url, "_blank");  
+}  
+  
+// گرفتن تبلیغات  
+async function fetchAds() {  
+  try {  
+    const res = await fetch(`${API_BASE}/api/ads`);  
+    return await res.json();  
+  } catch {  
+    return [];  
+  }  
+}  
+  
+async function showRandomAd() {    
+  const ads = await fetchAds();    
+  const adBox = document.getElementById("adBox");    
+    
+  if (ads.length === 0) {    
+    adBox.innerHTML = "<p>📭 تبلیغی برای نمایش وجود ندارد.</p>";    
+    return;    
+  }    
+    
+  const randomAd = ads[Math.floor(Math.random() * ads.length)];    
+  await registerView(randomAd.id);    
+    
+  let html = "";    
+  if (randomAd.type === "text") {    
+  html = `    
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">    
+      ${randomAd.text}    
+    </a>    
+    ${randomAd.caption ? `<p style="margin:8px 0;color:#555;">${randomAd.caption}</p>` : ""}    
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">    
+      🔗 مشاهده تبلیغ    
+    </a>`;    
+} else if (randomAd.type === "image") {    
+  html = `    
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">    
+      <img src="${randomAd.src}" alt="تبلیغ">    
+    </a>    
+    ${randomAd.caption ? `<p style="margin:8px 0;color:#555;">${randomAd.caption}</p>` : ""}  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">    
+      🔗 مشاهده تبلیغ    
+    </a>`;    
+} else if (randomAd.type === "video") {    
+  html = `    
+    <a href="${randomAd.link}" target="_blank" onclick="registerClick('${randomAd.id}')">    
+      <video controls style="max-width:100%; border-radius:10px;">    
+        <source src="${randomAd.src}" type="video/mp4">    
+        مرورگر شما از ویدیو پشتیبانی نمی‌کند.    
+      </video>    
+    </a>    
+    ${randomAd.caption ? `<p style="margin:8px 0;color:#555;">${randomAd.caption}</p>` : ""}  
+    <a href="${randomAd.link}" class="ad-btn" onclick="registerClick('${randomAd.id}')">    
+      🔗 مشاهده بیشتر    
+    </a>`;    
+    }    
+    
+  adBox.innerHTML = html;    
+    }  
+  
+// نمایش تبلیغ اول  
+showRandomAd();  
+// تغییر هر ۳۰ ثانیه  
+setInterval(showRandomAd, 30000);  
+  
+// تنظیمات  
+function toggleSettings() {  
+  document.getElementById("settingsPanel").classList.toggle("active");  
+}  
+function setTheme(mode) {  
+  document.body.classList.toggle("dark", mode === "dark");  
+  localStorage.setItem("theme", mode);  
+}  
+function setColor(color) {  
+  document.documentElement.style.setProperty("--primary-color", color);  
+  localStorage.setItem("primaryColor", color);  
+}  
+window.onload = function() {  
+  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");  
+  const savedColor = localStorage.getItem("primaryColor");  
+  if (savedColor) document.documentElement.style.setProperty("--primary-color", savedColor);  
+}  
+</script>  
+</body>  
 </html>

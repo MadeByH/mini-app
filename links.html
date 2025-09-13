@@ -118,36 +118,36 @@
 
     document.addEventListener('DOMContentLoaded', () => {
         displayLog("DOMContentLoaded فعال شد. بررسی WebApp...");
-        if (window.WebApp && typeof window.WebApp.ready === 'function') {
+        if (window.Bale.WebApp && typeof window.Bale.WebApp.ready === 'function') {
             try {
-                window.WebApp.ready();
-                displayLog("WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
+                window.Bale.WebApp.ready();
+                displayLog("Bale.WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
             } catch (e) {
-                displayLog(`خطا: WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
+                displayLog(`خطا: Bale.WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
             }
         } else {
-            displayLog("هشدار: شیء WebApp یا تابع WebApp.ready() یافت نشد. آیا miniapp.js بارگذاری شده و شما در بله هستید؟", 'warn');
+            displayLog("هشدار: شیء Bale.WebApp یا تابع Bale.WebApp.ready() یافت نشد. آیا miniapp.js بارگذاری شده و شما در بله هستید؟", 'warn');
         }
     });
 
     function openBaleLink(url) {
         displayLog(`تلاش برای باز کردن لینک: ${url}`);
 
-        if (window.WebApp && typeof window.WebApp.openLink === 'function') {
+        if (window.Bale.WebApp && typeof window.Bale.WebApp.openLink === 'function') {
             try {
-                displayLog("تلاش برای استفاده از WebApp.openLink برای URL:", 'info');
+                displayLog("تلاش برای استفاده از Bale.WebApp.openLink برای URL:", 'info');
 
                 if (url.startsWith('https://ble.ir/')) {
-                    displayLog("تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از WebApp.openLink.");
-                    window.WebApp.openLink(url);
+                    displayLog("تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از Bale.WebApp.openLink.");
+                    window.Bale.WebApp.openLink(url);
                 } else {
-                    displayLog("تشخیص داده شد: لینک خارجی. استفاده از WebApp.openLink.");
-                    window.WebApp.openLink(url);
+                    displayLog("تشخیص داده شد: لینک خارجی. استفاده از Bale.WebApp.openLink.");
+                    window.Bale.WebApp.openLink(url);
                 }
-                displayLog("WebApp.openLink فراخوانی شد.");
+                displayLog("Bale.WebApp.openLink فراخوانی شد.");
                 return;
             } catch (e) {
-                displayLog(`خطا: WebApp.openLink برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
+                displayLog(`خطا: Bale.WebApp.openLink برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
                 // اگر WebApp.openLink خطا داد، به fallback زیر می‌رویم.
             }
         } else {

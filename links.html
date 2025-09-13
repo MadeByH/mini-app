@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>🔗 کانال‌ها و ربات‌ها</title>
 <style>
+    /* استایل‌های شما بدون تغییر */
     body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }
     .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
     h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }
@@ -45,23 +46,40 @@
 <!-- کتابخانه مینی‌اپ -->
 <script src="https://tapi.bale.ai/miniapp.js?2"></script>
 <script>
-  // وقتی صفحه کامل لود شد
-  window.onload = function () {
-    if (window.BaleMiniApp && BaleMiniApp.ready) {
-      BaleMiniApp.ready();
+  // وقتی DOM کامل لود شد (روش مطمئن‌تر از window.onload)
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM content loaded.");
+    if (window.WebApp && typeof window.WebApp.ready === 'function') {
+      try {
+        window.WebApp.ready();
+        console.log("WebApp.ready() called successfully.");
+      } catch (e) {
+        console.error("Error calling WebApp.ready():", e);
+      }
+    } else {
+      console.warn("WebApp object or WebApp.ready() not found. Make sure miniapp.js is loaded and running inside Bale.");
     }
-  };
+  });
 
   // باز کردن لینک در مینی‌اپ یا مرورگر
   function openBaleLink(url) {
-    if (window.BaleMiniApp && BaleMiniApp.openLink) {
-      BaleMiniApp.openLink(url, { try_instant_view: true });
+    console.log(`Attempting to open link: ${url}`);
+    if (window.WebApp && typeof window.WebApp.openLink === 'function') {
+      try {
+        // ابتدا بدون try_instant_view تست کنید
+        window.WebApp.openLink(url);
+        console.log("Link opened via WebApp.openLink.");
+      } catch (e) {
+        console.error("Error using WebApp.openLink, falling back to window.open:", e);
+        window.open(url, "_blank");
+      }
     } else {
+      console.warn("WebApp.openLink not available, falling back to window.open.");
       window.open(url, "_blank");
     }
   }
 
-    // کپی کردن لینک
+    // کپی کردن لینک (بدون تغییر، این بخش خوب کار می‌کند)
     function copyLink(elementId) {
         const linkElement = document.getElementById(elementId);
         const linkToCopy = linkElement.href;
@@ -103,7 +121,7 @@
         }
         document.body.removeChild(textArea);
     }
-            </script>
+</script>
 </head>
 <body>
 <div class="container">

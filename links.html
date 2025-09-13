@@ -1,38 +1,61 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>تست openLink در بله</title>
-  <script src="https://tapi.bale.ai/miniapp.js"></script>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      if (window.Bale && Bale.WebApp && Bale.WebApp.ready) {
-        Bale.WebApp.ready();
-      }
-    });
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🔗 کانال‌ها و ربات‌ها</title>
+<style>
+    body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }
+    .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }
+    .button { display: block; width: 100%; margin: 12px 0 5px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; }
+    .button:hover { background: #2980b9; }
+    .back-btn { background: #7f8c8d; }
+    .back-btn:hover { background: #636e72; }
+    .icon { width: 22px; height: 22px; object-fit: contain; vertical-align: middle; margin-left: 8px; }
+</style>
 
-    function testOpenLink(url) {
-      try {
-        Bale.WebApp.openLink(url);
-      } catch (e) {
-        alert("خطا: " + e.message);
-        console.error(e);
-      }
+<script>
+    // باز کردن لینک با ریدایرکت مستقیم
+    function openBaleLink(url) {
+        window.location.href = url;
     }
-  </script>
+</script>
 </head>
-<body style="text-align:center; font-family:tahoma; padding:30px;">
-  <h2>تست Bale.WebApp.openLink</h2>
+<body>
+<div class="container">
+    <h1>🔗 کانال‌ها و ربات‌ها</h1>
 
-  <!-- تست لینک خارجی -->
-  <button onclick="testOpenLink('https://example.com')" style="padding:12px 20px; margin:10px; font-size:16px;">
-    باز کردن Example.com
-  </button>
+    <!-- لینک‌های بله -->
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/add_members_bot')">
+        <img src="bale.png" alt="بله" class="icon"> ربات بله
+    </a>
 
-  <!-- تست لینک داخلی بله -->
-  <button onclick="testOpenLink('https://ble.ir/add_members_bot')" style="padding:12px 20px; margin:10px; font-size:16px;">
-    باز کردن ربات بله
-  </button>
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/channel_member_and_manager_bot')">
+        <img src="bale.png" alt="بله" class="icon"> کانال بله
+    </a>
+
+    <!-- لینک‌های تلگرام -->
+    <a href="https://t.me/channel_members_and_manage_bot" class="button">
+        <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام
+    </a>
+
+    <a href="https://t.me/Members_and_Manage_Bot" class="button">
+        <img src="telegram.png" alt="تلگرام" class="icon"> ربات تلگرام
+    </a>
+
+    <!-- لینک‌های ایتا -->
+    <a href="https://eitaa.com/bot_add_members" class="button">
+        <img src="eitaa.png" alt="ایتــا" class="icon"> کانال ایتا
+    </a>
+
+    <!-- لینک‌های روبیکا -->
+    <a href="https://rubika.ir/channel_members_and_manage_bot" class="button">
+        <img src="rubika.png" alt="روبیکا" class="icon"> کانال روبیکا
+    </a>
+
+    <!-- دکمه بازگشت -->
+    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
+</div>
 </body>
 </html>

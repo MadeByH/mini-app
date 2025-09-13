@@ -77,11 +77,12 @@
 <!-- کتابخانه مینی‌اپ -->
 <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 <script>
+    let baleWebAppApiReady = false; // Flag to check if Bale.WebApp is ready
+
     // ------------------------------
     // تابع جدید برای نمایش لاگ روی صفحه
     // ------------------------------
     function displayLog(message, type = 'info') {
-        // برای نمایش در کنسول هم، کماکان console.log را نگه می‌داریم
         if (type === 'error') {
             console.error(message);
         } else if (type === 'warn') {
@@ -102,56 +103,80 @@
         logMessageElement.textContent = message;
         logArea.appendChild(logMessageElement);
 
-        // نمایش لاگ
         setTimeout(() => {
             logMessageElement.style.opacity = '1';
-        }, 100); // کمی تاخیر برای اعمال ترنزیشن
+        }, 100);
 
-        // محو کردن و حذف لاگ بعد از چند ثانیه
         setTimeout(() => {
             logMessageElement.style.opacity = '0';
             logMessageElement.addEventListener('transitionend', () => {
                 logMessageElement.remove();
             }, { once: true });
-        }, 5000); // لاگ به مدت 5 ثانیه نمایش داده می‌شود
+        }, 5000);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        displayLog("DOMContentLoaded فعال شد. بررسی WebApp...");
-        if (window.Bale.WebApp && typeof window.Bale.WebApp.ready === 'function') {
-            try {
-                window.Bale.WebApp.ready();
-                displayLog("Bale.WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
-            } catch (e) {
-                displayLog(`خطا: Bale.WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
+    // Function to initialize Bale WebApp API
+    function initializeBaleWebApp() {
+        displayLog("DOMContentLoaded فعال شد. در حال بررسی Bale.WebApp...");
+        if (window.Bale && window.Bale.WebApp) {
+            displayLog("شیء Bale.WebApp یافت شد.");
+            if (typeof window.Bale.WebApp.ready === 'function') {
+                try {
+                    window.Bale.WebApp.ready();
+                    displayLog("Bale.WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
+                    baleWebAppApiReady = true; // Set flag to true
+                } catch (e) {
+                    displayLog(`خطا: Bale.WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
+                }
+            } else {
+                displayLog("هشدار: تابع Bale.WebApp.ready() یافت نشد.", 'warn');
             }
         } else {
-            displayLog("هشدار: شیء Bale.WebApp یا تابع Bale.WebApp.ready() یافت نشد. آیا miniapp.js بارگذاری شده و شما در بله هستید؟", 'warn');
+            displayLog("هشدار: شیء Bale.WebApp یافت نشد. آیا miniapp.js به درستی بارگذاری شده و شما در محیط بله هستید؟", 'warn');
         }
-    });
+    }
+
+    // Try to initialize immediately
+    initializeBaleWebApp();
+
+    // If not ready after initial check, set an interval to keep checking
+    // This helps if the API is not immediately available after DOMContentLoaded
+    if (!baleWebAppApiReady) {
+        const checkInterval = setInterval(() => {
+            if (window.Bale && window.Bale.WebApp) {
+                displayLog("Bale.WebApp پس از تاخیر یافت شد.");
+                initializeBaleWebApp(); // Try initializing again
+                clearInterval(checkInterval); // Stop the interval once found
+            } else {
+                displayLog("در حال انتظار برای Bale.WebApp...", 'info');
+            }
+        }, 500); // Check every 500ms
+
+        // Optional: Set a timeout to stop checking if it takes too long
+        setTimeout(() => {
+            if (!baleWebAppApiReady) {
+                displayLog("خطا: Bale.WebApp پس از زمان طولانی آماده نشد. بارگذاری اسکریپت یا محیط ممکن است مشکل داشته باشد.", 'error');
+                clearInterval(checkInterval);
+            }
+        }, 10000); // Stop checking after 10 seconds if still not ready
+    }
 
     function openBaleLink(url) {
         displayLog(`تلاش برای باز کردن لینک: ${url}`);
 
-        if (window.Bale.WebApp && typeof window.Bale.WebApp.openLink === 'function') {
+        if (baleWebAppApiReady && window.Bale.WebApp && typeof window.Bale.WebApp.openLink === 'function') {
             try {
                 displayLog("تلاش برای استفاده از Bale.WebApp.openLink برای URL:", 'info');
 
-                if (url.startsWith('https://ble.ir/')) {
-                    displayLog("تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از Bale.WebApp.openLink.");
-                    window.Bale.WebApp.openLink(url);
-                } else {
-                    displayLog("تشخیص داده شد: لینک خارجی. استفاده از Bale.WebApp.openLink.");
-                    window.Bale.WebApp.openLink(url);
-                }
+                // Direct call to openLink, as it should handle internal/external links
+                window.Bale.WebApp.openLink(url);
                 displayLog("Bale.WebApp.openLink فراخوانی شد.");
                 return;
             } catch (e) {
                 displayLog(`خطا: Bale.WebApp.openLink برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
-                // اگر WebApp.openLink خطا داد، به fallback زیر می‌رویم.
             }
         } else {
-            displayLog("هشدار: شیء WebApp یا تابع WebApp.openLink یافت نشد. بازگشت به window.open (ممکن است مسدود شود).", 'warn');
+            displayLog("هشدار: Bale.WebApp آماده نیست یا تابع openLink در دسترس نیست. بازگشت به window.open.", 'warn');
         }
 
         // Fallback: تلاش برای باز کردن لینک با window.open
@@ -200,67 +225,46 @@
 <body>
 <div class="container">
     <h1>🔗 کانال‌ها و ربات‌ها</h1>
-
-    <!-- لینک‌های بله -->
-    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/add_members_bot?startapp')">
-        <img src="bale.png" alt="بله" class="icon"> ربات بله
-    </a>
     <div class="help-text">
-        <span>اگر ربات بله باز نشد، از این لینک استفاده کنید:</span>
-        <a id="ble-bot-link" href="https://ble.ir/add_members_bot" target="_blank">https://ble.ir/add_members_bot</a>
-        <button class="copy-button" onclick="copyLink('ble-bot-link')">کپی</button>
+        اگر ربات بله باز نشد، از این لینک استفاده کنید:
+        <a id="bot-link" href="https://ble.ir/add_members_bot">https://ble.ir/add_members_bot</a>
+        <button class="copy-button" onclick="copyLink('bot-link')"></button>
+    </div>
+    <a href="https://ble.ir/add_members_bot" class="button">ربات بله</a>
+
+    <div class="help-text">
+        اگر کانال بله باز نشد، از این لینک استفاده کنید:
+        <a id="channel-link" href="https://ble.ir/channel_member_and_manager_bot">https://ble.ir/channel_member_and_manager_bot</a>
+        <button class="copy-button" onclick="copyLink('channel-link')"></button>
+    </div>
+    <a href="https://ble.ir/channel_member_and_manager_bot" class="button">کانال بله</a>
+
+    <div class="help-text">
+        تلاش برای باز کردن لینک: <a href="https://ble.ir/add_members_bot?startapp">https://ble.ir/add_members_bot?startapp</a>
+        <button class="copy-button" onclick="copyLink('bot-link')"></button>
+    </div>
+    <a href="#" onclick="openBaleLink('https://ble.ir/add_members_bot?startapp'); return false;" class="button">تلاش برای باز کردن لینک</a>
+
+    <div class="help-text">
+        تلاش برای استفاده از Bale.WebApp.openLink برای URL:
+        <a id="tme-link" href="https://t.me/channel_members_and_manage_bot">https://t.me/channel_members_and_manage_bot</a>
+        <button class="copy-button" onclick="copyLink('tme-link')"></button>
+    </div>
+    <a href="#" onclick="openBaleLink('https://t.me/channel_members_and_manage_bot'); return false;" class="button">تلاش برای استفاده از Bale.WebApp.openLink</a>
+
+    <div class="help-text">
+        تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از
+        Bale.WebApp.openLink
     </div>
 
-    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/channel_member_and_manager_bot?startapp')">
-        <img src="bale.png" alt="بله" class="icon"> کانال بله
-    </a>
     <div class="help-text">
-        <span>اگر کانال بله باز نشد، از این لینک استفاده کنید:</span>
-        <a id="ble-channel-link" href="https://ble.ir/channel_member_and_manager_bot" target="_blank">https://ble.ir/channel_member_and_manager_bot</a>
-        <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>
+        اگر کانال ایتا باز نشد، از این لینک استفاده کنید:
+        <a id="eitaa-link" href="https://eitaa.com/bot_add_members">https://eitaa.com/bot_add_members</a>
+        <button class="copy-button" onclick="copyLink('eitaa-link')"></button>
     </div>
+     <a href="#" onclick="openBaleLink('https://eitaa.com/bot_add_members'); return false;" class="button">تلاش برای window.open با fallback</a>
 
-    <!-- لینک‌های تلگرام (این لینک‌ها مستقیماً به تلگرام می‌روند و از openBaleLink استفاده نمی‌کنند) -->
-    <a href="https://t.me/channel_members_and_manage_bot" class="button">
-        <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام
-    </a>
-    <div class="help-text">
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
-        <a id="telegram-channel-link" href="https://t.me/channel_members_and_manage_bot" target="_blank">https://t.me/channel_members_and_manage_bot</a>
-        <button class="copy-button" onclick="copyLink('telegram-channel-link')">کپی</button>
-    </div>
-
-    <a href="https://t.me/Members_and_Manage_Bot" class="button">
-        <img src="telegram.png" alt="تلگرام" class="icon"> ربات تلگرام
-    </a>
-    <div class="help-text">
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
-        <a id="telegram-bot-link" href="https://t.me/Members_and_Manage_Bot" target="_blank">https://t.me/Members_and_Manage_Bot</a>
-        <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>
-    </div>
-
-    <!-- لینک‌های ایتا -->
-    <a href="https://eitaa.com/bot_add_members" class="button">
-        <img src="eitaa.png" alt="ایتــا" class="icon"> کانال ایتا
-    </a>
-    <div class="help-text">
-        <span>اگر کانال ایتا باز نشد، از این لینک استفاده کنید:</span>
-        <a id="eitaa-channel-link" href="https://eitaa.com/bot_add_members" target="_blank">https://eitaa.com/bot_add_members</a>
-        <button class="copy-button" onclick="copyLink('eitaa-channel-link')">کپی</button>
-    </div>
-
-    <!-- لینک‌های روبیکا -->
-    <a href="https://rubika.ir/channel_members_and_manage_bot" class="button">
-        <img src="rubika.png" alt="روبیکا" class="icon"> کانال روبیکا
-    </a>
-    <div class="help-text">
-        <span>اگر کانال روبیکا باز نشد، از این لینک استفاده کنید:</span>
-        <a id="rubika-channel-link" href="https://rubika.ir/channel_members_and_manage_bot" target="_blank">https://rubika.ir/channel_members_and_manage_bot</a>
-        <button class="copy-button" onclick="copyLink('rubika-channel-link')">کپی</button>
-    </div>
-
-    <!-- دکمه بازگشت -->
-    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
 </div>
+<div id="log-display-area"></div>
 </body>
 </html>

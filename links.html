@@ -31,7 +31,7 @@
         align-items: center;
         gap: 4px;
     }
-    .copy-button:hover { background-color: #e0e0e0; }
+    .copy-button:hover { background-color: #e0f0e0; }
     .copy-button::before { content: "📋"; font-size: 1em; line-height: 1; }
 
     .icon {
@@ -41,66 +41,140 @@
         vertical-align: middle;
         margin-left: 8px;
     }
+
+    /* ------------------------------ */
+    /* استایل‌های جدید برای نمایش لاگ‌ها */
+    /* ------------------------------ */
+    #log-display-area {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .log-message {
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.9em;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .log-message.info { background-color: rgba(52, 152, 219, 0.8); } /* آبی برای اطلاعات */
+    .log-message.warn { background-color: rgba(243, 156, 18, 0.8); } /* نارنجی برای هشدار */
+    .log-message.error { background-color: rgba(231, 76, 60, 0.9); } /* قرمز برای خطا */
 </style>
 
 <!-- کتابخانه مینی‌اپ -->
-<script src="https://tapi.bale.ai/miniapp.js?3"></script>
+<script src="https://tapi.bale.ai/miniapp.js?2"></script>
 <script>
-  // وقتی DOM کامل لود شد (روش مطمئن‌تر از window.onload)
-  document.addEventListener('DOMContentLoaded', () => {
-    console.log("DOM content loaded.");
-    if (window.WebApp && typeof window.WebApp.ready === 'function') {
-      try {
-        window.WebApp.ready();
-        console.log("WebApp.ready() called successfully.");
-      } catch (e) {
-        console.error("Error calling WebApp.ready():", e);
-      }
-    } else {
-      console.warn("WebApp object or WebApp.ready() not found. Make sure miniapp.js is loaded and running inside Bale.");
-    }
-  });
+    // ------------------------------
+    // تابع جدید برای نمایش لاگ روی صفحه
+    // ------------------------------
+    function displayLog(message, type = 'info') {
+        // برای نمایش در کنسول هم، کماکان console.log را نگه می‌داریم
+        if (type === 'error') {
+            console.error(message);
+        } else if (type === 'warn') {
+            console.warn(message);
+        } else {
+            console.log(message);
+        }
 
-  // باز کردن لینک در مینی‌اپ یا مرورگر
-  function openBaleLink(url) {
-    console.log(`Attempting to open link: ${url}`);
-    if (window.WebApp && typeof window.WebApp.openLink === 'function') {
-      try {
-        // ابتدا بدون try_instant_view تست کنید
-        window.WebApp.openLink(url);
-        console.log("Link opened via WebApp.openLink.");
-      } catch (e) {
-        console.error("Error using WebApp.openLink, falling back to window.open:", e);
-        window.open(url, "_blank");
-      }
-    } else {
-      console.warn("WebApp.openLink not available, falling back to window.open.");
-      window.open(url, "_blank");
-    }
-  }
+        let logArea = document.getElementById('log-display-area');
+        if (!logArea) {
+            logArea = document.createElement('div');
+            logArea.id = 'log-display-area';
+            document.body.appendChild(logArea);
+        }
 
-    // کپی کردن لینک (بدون تغییر، این بخش خوب کار می‌کند)
+        const logMessageElement = document.createElement('div');
+        logMessageElement.classList.add('log-message', type);
+        logMessageElement.textContent = message;
+        logArea.appendChild(logMessageElement);
+
+        // نمایش لاگ
+        setTimeout(() => {
+            logMessageElement.style.opacity = '1';
+        }, 100); // کمی تاخیر برای اعمال ترنزیشن
+
+        // محو کردن و حذف لاگ بعد از چند ثانیه
+        setTimeout(() => {
+            logMessageElement.style.opacity = '0';
+            logMessageElement.addEventListener('transitionend', () => {
+                logMessageElement.remove();
+            }, { once: true });
+        }, 5000); // لاگ به مدت 5 ثانیه نمایش داده می‌شود
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        displayLog("DOMContentLoaded فعال شد. بررسی WebApp...");
+        if (window.WebApp && typeof window.WebApp.ready === 'function') {
+            try {
+                window.WebApp.ready();
+                displayLog("WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
+            } catch (e) {
+                displayLog(`خطا: WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
+            }
+        } else {
+            displayLog("هشدار: شیء WebApp یا تابع WebApp.ready() یافت نشد. آیا miniapp.js بارگذاری شده و شما در بله هستید؟", 'warn');
+        }
+    });
+
+    function openBaleLink(url) {
+        displayLog(`تلاش برای باز کردن لینک: ${url}`);
+
+        if (window.WebApp && typeof window.WebApp.openLink === 'function') {
+            try {
+                displayLog("تلاش برای استفاده از WebApp.openLink برای URL:", 'info');
+
+                if (url.startsWith('https://ble.ir/')) {
+                    displayLog("تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از WebApp.openLink.");
+                    window.WebApp.openLink(url);
+                } else {
+                    displayLog("تشخیص داده شد: لینک خارجی. استفاده از WebApp.openLink.");
+                    window.WebApp.openLink(url);
+                }
+                displayLog("WebApp.openLink فراخوانی شد.");
+                return;
+            } catch (e) {
+                displayLog(`خطا: WebApp.openLink برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
+                // اگر WebApp.openLink خطا داد، به fallback زیر می‌رویم.
+            }
+        } else {
+            displayLog("هشدار: شیء WebApp یا تابع WebApp.openLink یافت نشد. بازگشت به window.open (ممکن است مسدود شود).", 'warn');
+        }
+
+        // Fallback: تلاش برای باز کردن لینک با window.open
+        try {
+            displayLog("تلاش برای fallback با window.open برای URL:", 'info');
+            window.open(url, "_blank");
+            displayLog("window.open فراخوانی شد.");
+        } catch (e) {
+            displayLog(`خطا: window.open برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
+            alert("متاسفانه لینک باز نشد. ممکن است مینی‌اپ اجازه باز کردن لینک‌های خارجی را نداشته باشد یا مشکلی در سیستم وجود دارد.");
+        }
+    }
+
+    // کپی کردن لینک (بدون تغییر)
     function copyLink(elementId) {
         const linkElement = document.getElementById(elementId);
         const linkToCopy = linkElement.href;
 
         if (navigator.clipboard && navigator.clipboard.writeText) {
             navigator.clipboard.writeText(linkToCopy).then(() => {
-                const successMessage = document.createElement('div');
-                successMessage.textContent = 'لینک با موفقیت کپی شد!';
-                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';
-                document.body.appendChild(successMessage);
-
-                function fadeInOut() {
-                    successMessage.style.opacity = '1';
-                    setTimeout(() => {
-                        successMessage.style.opacity = '0';
-                        setTimeout(() => { successMessage.remove(); }, 1000);
-                    }, 2000);
-                }
-                fadeInOut();
+                displayLog('لینک با موفقیت کپی شد! (API)', 'info');
             }).catch(err => {
-                console.error('خطا در کپی کردن لینک: ', err);
+                displayLog(`خطا در کپی کردن لینک با API: ${err.message || err}`, 'error');
                 fallbackCopyTextToClipboard(linkToCopy);
             });
         } else {
@@ -115,9 +189,9 @@
         textArea.select();
         try {
             document.execCommand('copy');
-            alert('لینک با موفقیت کپی شد! (روش جایگزین)');
+            displayLog('لینک با موفقیت کپی شد! (روش جایگزین)', 'info');
         } catch (err) {
-            alert('خطا در کپی کردن لینک: ' + text);
+            displayLog(`خطا در کپی کردن لینک با روش جایگزین: ${err.message || err}`, 'error');
         }
         document.body.removeChild(textArea);
     }
@@ -146,7 +220,7 @@
         <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>
     </div>
 
-    <!-- لینک‌های تلگرام -->
+    <!-- لینک‌های تلگرام (این لینک‌ها مستقیماً به تلگرام می‌روند و از openBaleLink استفاده نمی‌کنند) -->
     <a href="https://t.me/channel_members_and_manage_bot" class="button">
         <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام
     </a>

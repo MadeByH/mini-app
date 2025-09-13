@@ -42,22 +42,24 @@
     }
 </style>
 
-<!-- 📌 کتابخانه مینی‌اپ بله -->
+<!-- کتابخانه مینی‌اپ -->
 <script src="https://tapi.bale.ai/miniapp.js?3"></script>
 <script>
-    // اعلام آماده بودن
-    if (window.WebApp && WebApp.ready) {
-        WebApp.ready();
+  // وقتی صفحه کامل لود شد
+  window.onload = function () {
+    if (window.BaleMiniApp && BaleMiniApp.ready) {
+      BaleMiniApp.ready();
     }
+  };
 
-    // باز کردن لینک در مینی‌اپ بله یا مرورگر
-    function openBaleLink(url) {
-        if (window.WebApp && WebApp.openLink) {
-            WebApp.openLink(url, { try_instant_view: true });
-        } else {
-            window.open(url, "_blank");
-        }
+  // باز کردن لینک در مینی‌اپ یا مرورگر
+  function openBaleLink(url) {
+    if (window.BaleMiniApp && BaleMiniApp.openLink) {
+      BaleMiniApp.openLink(url, { try_instant_view: true });
+    } else {
+      window.open(url, "_blank");
     }
+  }
 
     // کپی کردن لینک
     function copyLink(elementId) {

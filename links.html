@@ -1,156 +1,266 @@
-<!DOCTYPE html>  
-<html lang="fa">  
-<head>  
-<meta charset="UTF-8" />  
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>  
-<title>🔗 کانال‌ها و ربات‌ها</title>  
-<style>  
-    body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }  
-    .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }  
-    h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }  
-    .button { display: block; width: 100%; margin: 12px 0 5px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; }  
-    .button:hover { background: #2980b9; }  
-    .back-btn { background: #7f8c8d; }  
-    .back-btn:hover { background: #636e72; }  
-    .help-text { font-size: 0.9em; color: #555; text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }  
-    .help-text a { color: #27ae60; text-decoration: none; font-weight: bold; margin: 0 5px; }  
-    .help-text a:hover { text-decoration: underline; }  
-  
-    .copy-button {  
-        background-color: #f0f0f0;  
-        color: #333;  
-        border: 1px solid #ccc;  
-        border-radius: 4px;  
-        padding: 5px 8px;  
-        font-size: 0.8em;  
-        cursor: pointer;  
-        transition: background-color 0.2s ease;  
-        margin-right: 5px;  
-        display: inline-flex;  
-        align-items: center;  
-        gap: 4px;  
-    }  
-    .copy-button:hover { background-color: #e0e0e0; }  
-    .copy-button::before { content: "📋"; font-size: 1em; line-height: 1; }  
-  
-    /* ✅ همه لوگوها یک اندازه */  
-    .icon {  
-        width: 22px;  
-        height: 22px;  
-        object-fit: contain;  
-        vertical-align: middle;  
-        margin-left: 8px;  
-    }  
-</style>  
-</head>  
-<body>  
-<div class="container">  
-    <h1>🔗 کانال‌ها و ربات‌ها</h1>  
-  
-    <!-- لینک‌های بله -->  
-    <a href="https://ble.ir/add_members_bot?startapp" class="button">  
-        <img src="bale.png" alt="بله" class="icon"> ربات بله  
-    </a>  
-    <div class="help-text">  
-        <span>اگر ربات بله باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="ble-bot-link" href="https://ble.ir/add_members_bot" target="_blank">https://ble.ir/add_members_bot</a>  
-        <button class="copy-button" onclick="copyLink('ble-bot-link')">کپی</button>  
-    </div>  
-  
-    <a href="https://ble.ir/channel_member_and_manager_bot?startapp" class="button">  
-        <img src="bale.png" alt="بله" class="icon"> کانال بله  
-    </a>  
-    <div class="help-text">  
-        <span>اگر کانال بله باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="ble-channel-link" href="https://ble.ir/channel_member_and_manager_bot" target="_blank">https://ble.ir/channel_member_and_manager_bot</a>  
-        <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>  
-    </div>  
-  
-    <!-- لینک‌های تلگرام -->  
-    <a href="https://t.me/channel_members_and_manage_bot" class="button">  
-        <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام  
-    </a>  
-    <div class="help-text">  
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="telegram-channel-link" href="https://t.me/channel_members_and_manage_bot" target="_blank">https://t.me/channel_members_and_manage_bot</a>  
-        <button class="copy-button" onclick="copyLink('telegram-channel-link')">کپی</button>  
-    </div>  
-  
-    <a href="https://t.me/Members_and_Manage_Bot" class="button">  
-        <img src="telegram.png" alt="تلگرام" class="icon"> ربات تلگرام  
-    </a>  
-    <div class="help-text">  
-        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="telegram-bot-link" href="https://t.me/Members_and_Manage_Bot" target="_blank">https://t.me/Members_and_Manage_Bot</a>  
-        <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>  
-    </div>  
-  
-    <!-- لینک‌های ایتا -->  
-    <a href="https://eitaa.com/bot_add_members" class="button">  
-        <img src="eitaa.png" alt="ایتــا" class="icon"> کانال ایتا  
-    </a>  
-    <div class="help-text">  
-        <span>اگر کانال ایتا باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="eitaa-channel-link" href="https://eitaa.com/bot_add_members" target="_blank">https://eitaa.com/bot_add_members</a>  
-        <button class="copy-button" onclick="copyLink('eitaa-channel-link')">کپی</button>  
-    </div>  
-  
-    <!-- لینک‌های روبیکا -->  
-    <a href="https://rubika.ir/channel_members_and_manage_bot" class="button">  
-        <img src="rubika.png" alt="روبیکا" class="icon"> کانال روبیکا  
-    </a>  
-    <div class="help-text">  
-        <span>اگر کانال روبیکا باز نشد، از این لینک استفاده کنید:</span>  
-        <a id="rubika-channel-link" href="https://rubika.ir/channel_members_and_manage_bot" target="_blank">https://rubika.ir/channel_members_and_manage_bot</a>  
-        <button class="copy-button" onclick="copyLink('rubika-channel-link')">کپی</button>  
-    </div>  
-  
-    <!-- دکمه بازگشت -->  
-    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>  
-</div>  
-  
-<script>  
-    function copyLink(elementId) {  
-        const linkElement = document.getElementById(elementId);  
-        const linkToCopy = linkElement.href;  
-  
-        if (navigator.clipboard && navigator.clipboard.writeText) {  
-            navigator.clipboard.writeText(linkToCopy).then(() => {  
-                const successMessage = document.createElement('div');  
-                successMessage.textContent = 'لینک با موفقیت کپی شد!';  
-                successMessage.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background-color: #27ae60; color: white; padding: 15px; border-radius: 8px; z-index: 1000; font-size: 1.1em; opacity: 0; animation: fadeInOut 3s ease-out forwards;';  
-                document.body.appendChild(successMessage);  
-  
-                function fadeInOut() {  
-                    successMessage.style.opacity = '1';  
-                    setTimeout(() => {  
-                        successMessage.style.opacity = '0';  
-                        setTimeout(() => { successMessage.remove(); }, 1000);  
-                    }, 2000);  
-                }  
-                fadeInOut();  
-            }).catch(err => {  
-                console.error('خطا در کپی کردن لینک: ', err);  
-                fallbackCopyTextToClipboard(linkToCopy);  
-            });  
-        } else {  
-            fallbackCopyTextToClipboard(linkToCopy);  
-        }  
-    }  
-  
-    function fallbackCopyTextToClipboard(text) {  
-        const textArea = document.createElement("textarea");  
-        textArea.value = text;  
-        document.body.appendChild(textArea);  
-        textArea.select();  
-        try {  
-            document.execCommand('copy');  
-            alert('لینک با موفقیت کپی شد! (روش جایگزین)');  
-        } catch (err) {  
-            alert('خطا در کپی کردن لینک: ' + text);  
-        }  
-        document.body.removeChild(textArea);  
-    }  
-</script>  
-</body>  
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>🔗 کانال‌ها و ربات‌ها</title>
+<style>
+    /* استایل‌های شما بدون تغییر */
+    body { font-family: Tahoma, sans-serif; direction: rtl; text-align: right; margin: 0; padding: 0; background: #f4f6f9; }
+    .container { max-width: 700px; margin: 20px auto; padding: 20px; background: #fff; border-radius: 15px; box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+    h1 { font-size: 1.8em; color: #27ae60; text-align: center; margin-bottom: 20px; }
+    .button { display: block; width: 100%; margin: 12px 0 5px 0; padding: 14px; text-align: center; background: #3498db; color: #fff; text-decoration: none; border-radius: 8px; font-weight: bold; transition: 0.3s; }
+    .button:hover { background: #2980b9; }
+    .back-btn { background: #7f8c8d; }
+    .back-btn:hover { background: #636e72; }
+    .help-text { font-size: 0.9em; color: #555; text-align: center; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; }
+    .help-text a { color: #27ae60; text-decoration: none; font-weight: bold; margin: 0 5px; }
+    .help-text a:hover { text-decoration: underline; }
+
+    .copy-button {
+        background-color: #f0f0f0;
+        color: #333;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        padding: 5px 8px;
+        font-size: 0.8em;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        margin-right: 5px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .copy-button:hover { background-color: #e0f0e0; }
+    .copy-button::before { content: "📋"; font-size: 1em; line-height: 1; }
+
+    .icon {
+        width: 22px;
+        height: 22px;
+        object-fit: contain;
+        vertical-align: middle;
+        margin-left: 8px;
+    }
+
+    /* ------------------------------ */
+    /* استایل‌های جدید برای نمایش لاگ‌ها */
+    /* ------------------------------ */
+    #log-display-area {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .log-message {
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        font-size: 0.9em;
+        text-align: center;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .log-message.info { background-color: rgba(52, 152, 219, 0.8); } /* آبی برای اطلاعات */
+    .log-message.warn { background-color: rgba(243, 156, 18, 0.8); } /* نارنجی برای هشدار */
+    .log-message.error { background-color: rgba(231, 76, 60, 0.9); } /* قرمز برای خطا */
+</style>
+
+<!-- کتابخانه مینی‌اپ -->
+<script src="https://tapi.bale.ai/miniapp.js?3"></script>
+<script>
+    // ------------------------------
+    // تابع جدید برای نمایش لاگ روی صفحه
+    // ------------------------------
+    function displayLog(message, type = 'info') {
+        // برای نمایش در کنسول هم، کماکان console.log را نگه می‌داریم
+        if (type === 'error') {
+            console.error(message);
+        } else if (type === 'warn') {
+            console.warn(message);
+        } else {
+            console.log(message);
+        }
+
+        let logArea = document.getElementById('log-display-area');
+        if (!logArea) {
+            logArea = document.createElement('div');
+            logArea.id = 'log-display-area';
+            document.body.appendChild(logArea);
+        }
+
+        const logMessageElement = document.createElement('div');
+        logMessageElement.classList.add('log-message', type);
+        logMessageElement.textContent = message;
+        logArea.appendChild(logMessageElement);
+
+        // نمایش لاگ
+        setTimeout(() => {
+            logMessageElement.style.opacity = '1';
+        }, 100); // کمی تاخیر برای اعمال ترنزیشن
+
+        // محو کردن و حذف لاگ بعد از چند ثانیه
+        setTimeout(() => {
+            logMessageElement.style.opacity = '0';
+            logMessageElement.addEventListener('transitionend', () => {
+                logMessageElement.remove();
+            }, { once: true });
+        }, 5000); // لاگ به مدت 5 ثانیه نمایش داده می‌شود
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        displayLog("DOMContentLoaded فعال شد. بررسی WebApp...");
+        if (window.Bale.WebApp && typeof window.Bale.WebApp.ready === 'function') {
+            try {
+                window.Bale.WebApp.ready();
+                displayLog("Bale.WebApp.ready() فراخوانی شد. مینی‌اپ آماده تعامل است.");
+            } catch (e) {
+                displayLog(`خطا: Bale.WebApp.ready() اجرا نشد: ${e.message || e}`, 'error');
+            }
+        } else {
+            displayLog("هشدار: شیء Bale.WebApp یا تابع Bale.WebApp.ready() یافت نشد. آیا miniapp.js بارگذاری شده و شما در بله هستید؟", 'warn');
+        }
+    });
+
+    function openBaleLink(url) {
+        displayLog(`تلاش برای باز کردن لینک: ${url}`);
+
+        if (window.Bale.WebApp && typeof window.Bale.WebApp.openLink === 'function') {
+            try {
+                displayLog("تلاش برای استفاده از Bale.WebApp.openLink برای URL:", 'info');
+
+                if (url.startsWith('https://ble.ir/')) {
+                    displayLog("تشخیص داده شد: لینک داخلی/عمیق بله. استفاده از Bale.WebApp.openLink.");
+                    window.Bale.WebApp.openLink(url);
+                } else {
+                    displayLog("تشخیص داده شد: لینک خارجی. استفاده از Bale.WebApp.openLink.");
+                    window.Bale.WebApp.openLink(url);
+                }
+                displayLog("Bale.WebApp.openLink فراخوانی شد.");
+                return;
+            } catch (e) {
+                displayLog(`خطا: Bale.WebApp.openLink برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
+                // اگر WebApp.openLink خطا داد، به fallback زیر می‌رویم.
+            }
+        } else {
+            displayLog("هشدار: شیء WebApp یا تابع WebApp.openLink یافت نشد. بازگشت به window.open (ممکن است مسدود شود).", 'warn');
+        }
+
+        // Fallback: تلاش برای باز کردن لینک با window.open
+        try {
+            displayLog("تلاش برای fallback با window.open برای URL:", 'info');
+            window.open(url, "_blank");
+            displayLog("window.open فراخوانی شد.");
+        } catch (e) {
+            displayLog(`خطا: window.open برای URL '${url}' شکست خورد: ${e.message || e}`, 'error');
+            alert("متاسفانه لینک باز نشد. ممکن است مینی‌اپ اجازه باز کردن لینک‌های خارجی را نداشته باشد یا مشکلی در سیستم وجود دارد.");
+        }
+    }
+
+    // کپی کردن لینک (بدون تغییر)
+    function copyLink(elementId) {
+        const linkElement = document.getElementById(elementId);
+        const linkToCopy = linkElement.href;
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(linkToCopy).then(() => {
+                displayLog('لینک با موفقیت کپی شد! (API)', 'info');
+            }).catch(err => {
+                displayLog(`خطا در کپی کردن لینک با API: ${err.message || err}`, 'error');
+                fallbackCopyTextToClipboard(linkToCopy);
+            });
+        } else {
+            fallbackCopyTextToClipboard(linkToCopy);
+        }
+    }
+
+    function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        try {
+            document.execCommand('copy');
+            displayLog('لینک با موفقیت کپی شد! (روش جایگزین)', 'info');
+        } catch (err) {
+            displayLog(`خطا در کپی کردن لینک با روش جایگزین: ${err.message || err}`, 'error');
+        }
+        document.body.removeChild(textArea);
+    }
+</script>
+</head>
+<body>
+<div class="container">
+    <h1>🔗 کانال‌ها و ربات‌ها</h1>
+
+    <!-- لینک‌های بله -->
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/add_members_bot')">
+        <img src="bale.png" alt="بله" class="icon"> ربات بله
+    </a>
+    <div class="help-text">
+        <span>اگر ربات بله باز نشد، از این لینک استفاده کنید:</span>
+        <a id="ble-bot-link" href="https://ble.ir/add_members_bot" target="_blank">https://ble.ir/add_members_bot</a>
+        <button class="copy-button" onclick="copyLink('ble-bot-link')">کپی</button>
+    </div>
+
+    <a href="javascript:void(0)" class="button" onclick="openBaleLink('https://ble.ir/channel_member_and_manager_bot?startapp')">
+        <img src="bale.png" alt="بله" class="icon"> کانال بله
+    </a>
+    <div class="help-text">
+        <span>اگر کانال بله باز نشد، از این لینک استفاده کنید:</span>
+        <a id="ble-channel-link" href="https://ble.ir/channel_member_and_manager_bot" target="_blank">https://ble.ir/channel_member_and_manager_bot</a>
+        <button class="copy-button" onclick="copyLink('ble-channel-link')">کپی</button>
+    </div>
+
+    <!-- لینک‌های تلگرام (این لینک‌ها مستقیماً به تلگرام می‌روند و از openBaleLink استفاده نمی‌کنند) -->
+    <a href="https://t.me/channel_members_and_manage_bot" class="button">
+        <img src="telegram.png" alt="تلگرام" class="icon"> کانال تلگرام
+    </a>
+    <div class="help-text">
+        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
+        <a id="telegram-channel-link" href="https://t.me/channel_members_and_manage_bot" target="_blank">https://t.me/channel_members_and_manage_bot</a>
+        <button class="copy-button" onclick="copyLink('telegram-channel-link')">کپی</button>
+    </div>
+
+    <a href="https://t.me/Members_and_Manage_Bot" class="button">
+        <img src="telegram.png" alt="تلگرام" class="icon"> ربات تلگرام
+    </a>
+    <div class="help-text">
+        <span>اگر تلگرام باز نشد، از این لینک استفاده کنید:</span>
+        <a id="telegram-bot-link" href="https://t.me/Members_and_Manage_Bot" target="_blank">https://t.me/Members_and_Manage_Bot</a>
+        <button class="copy-button" onclick="copyLink('telegram-bot-link')">کپی</button>
+    </div>
+
+    <!-- لینک‌های ایتا -->
+    <a href="https://eitaa.com/bot_add_members" class="button">
+        <img src="eitaa.png" alt="ایتــا" class="icon"> کانال ایتا
+    </a>
+    <div class="help-text">
+        <span>اگر کانال ایتا باز نشد، از این لینک استفاده کنید:</span>
+        <a id="eitaa-channel-link" href="https://eitaa.com/bot_add_members" target="_blank">https://eitaa.com/bot_add_members</a>
+        <button class="copy-button" onclick="copyLink('eitaa-channel-link')">کپی</button>
+    </div>
+
+    <!-- لینک‌های روبیکا -->
+    <a href="https://rubika.ir/channel_members_and_manage_bot" class="button">
+        <img src="rubika.png" alt="روبیکا" class="icon"> کانال روبیکا
+    </a>
+    <div class="help-text">
+        <span>اگر کانال روبیکا باز نشد، از این لینک استفاده کنید:</span>
+        <a id="rubika-channel-link" href="https://rubika.ir/channel_members_and_manage_bot" target="_blank">https://rubika.ir/channel_members_and_manage_bot</a>
+        <button class="copy-button" onclick="copyLink('rubika-channel-link')">کپی</button>
+    </div>
+
+    <!-- دکمه بازگشت -->
+    <a href="index.html" class="button back-btn">🔙 بازگشت به صفحه اصلی</a>
+</div>
+</body>
 </html>
